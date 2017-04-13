@@ -1,0 +1,42 @@
+{
+  "name": "quiver",
+  "version": "0.4.2",
+  "scripts": {
+    "start": "serve",
+    "export": "rimraf dist && tsc && copy readme.md dist",
+    "build": "npm run build:patch",
+    "build:patch": "npm run test && npm run export && npm version patch && copy package.json dist && npm publish dist",
+    "build:minor": "npm run test && npm run export && npm version minor && copy package.json dist && npm publish dist",
+    "build:major": "npm run test && npm run export && npm version major && copy package.json dist && npm publish dist",
+    "test": "tsc -p tsconfig-test.json && npm run mochaWithLibraries && npm run clean",
+    "mochaWithLibraries": "mocha --require reflect-metadata",
+    "testOnFileChange": "mocha-typescript-watch",
+    "clean": "rimraf src/**/*.d.ts src/**/*.js src/**/*js.map test/**/*.d.ts test/**/*.js test/**/*js.map index.d.ts index.js index.js.map"
+  },
+  "main": "index.js",
+  "contributors": [
+    {
+      "name": "Jānis Radiņš",
+      "email": "jr@janisradins.com"
+    },
+    {
+      "name": "Kristaps Peļņa",
+      "email": "kristaps.pelna@me.com"
+    }
+  ],
+  "dependencies": {
+    "reflect-metadata": "^0.1.9"
+  },
+  "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.35",
+    "chai": "^3.5.0",
+    "copy": "^0.3.0",
+    "mocha": "^3.2.0",
+    "mocha-typescript": "^1.0.15",
+    "rimraf": "^2.5.4",
+    "serve": "^2.1.2",
+    "systemjs": "^0.19.41",
+    "typescript": "^2.1.4"
+  }
+}

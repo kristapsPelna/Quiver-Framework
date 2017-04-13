@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "preserveConstEnums": true,
+    "module": "es2015",
+    "moduleResolution": "node",
+    "removeComments": false,
+    "sourceMap": false,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "files": [
+    "./index.ts"
+  ],
+  "include": [
+    "./src/**/*",
+    "./node_modules/reflect-metadata/reflect-metadata.d.ts"
+  ],
+  "exclude": [
+    "./test",
+    "./src/Main.ts"
+  ]
+}

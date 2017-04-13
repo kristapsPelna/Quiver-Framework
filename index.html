@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Quiver Framework</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+        <script type="application/javascript" src="node_modules/reflect-metadata/Reflect.js"></script>
+        <script type="application/javascript" src="node_modules/typescript/lib/typescript.js"></script>
+        <script type="application/javascript" src="node_modules/systemjs/dist/system.src.js"></script>
+
+        <script type="application/javascript">
+
+            var map = {
+
+            };
+            var packages = {
+                src: {defaultExtension: 'ts'}
+            };
+
+            var config = {
+                transpiler: 'typescript',
+                typescriptOptions: {
+                    emitDecoratorMetadata: true
+                },
+                packages: packages,
+                map: map
+            }
+            System.config(config);
+            System.import('src/Main');//.catch(function(err){ console.error(err); });
+
+        </script>
+
+    </head>
+    <body>Foo Bar Lee</body>
+</html>
