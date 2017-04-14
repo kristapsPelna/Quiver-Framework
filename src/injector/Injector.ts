@@ -81,8 +81,9 @@ export class Injector extends EventDispatcher {
             this.unMap(type);
         }
 
-        let mapping:InjectionMapping = new InjectionMapping(type, this, this.MASTER_SEAL_KEY);
+        const mapping:InjectionMapping = new InjectionMapping(type, this, this.MASTER_SEAL_KEY);
         this.mappings.set(type, mapping);
+        this.dispatchEvent(new MappingEvent(MappingEvent.MAPPING_CREATED, type, mapping));
         return mapping;
     }
 
@@ -110,6 +111,7 @@ export class Injector extends EventDispatcher {
         //Destroy mapping
         mapping.destroy();
         this.mappings.delete(type);
+        this.dispatchEvent(new MappingEvent(MappingEvent.MAPPING_DESTROYED, type, mapping));
     }
 
     /**

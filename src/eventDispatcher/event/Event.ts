@@ -1,17 +1,9 @@
-
 /**
  * Basic event class which holds event type and data properties and which should be extended
  * by any custom event class.
  * @author Jānis Radiņš
  */
 export class Event {
-
-    protected _data:any;
-
-    constructor(type:string, data?:any) {
-        this.type = type;
-        this._data = data;
-    }
 
     /**
      * Event string type
@@ -20,10 +12,12 @@ export class Event {
 
     /**
      * Data shipped along with event notification, if any
-     * @returns {any}
      */
-    get data(): any {
-        return this._data;
+    readonly data:any;
+
+    constructor(type:string, data?:any) {
+        this.type = type;
+        this.data = data;
     }
 
     /**

@@ -9,7 +9,7 @@ export function Injectable():Function {
 
         let constructorArgs:Type<any>[] = Reflect.getMetadata("design:paramtypes", target);
 
-        if (constructorArgs.length > 0) {
+        if (constructorArgs && constructorArgs.length > 0) {
             metadataInternal.getTypeDescriptor(target).setConstructorArguments(constructorArgs);
         }
         return target;
