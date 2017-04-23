@@ -10,6 +10,14 @@ Quiver is a lightweight micro framework for TypeScript/JavaScript.
 * Command management
 * View management
 
+#### Installation
+
+Quiver Framework can be installed as an npm package:
+
+```bash
+$ npm install quiver-framework --save-dev
+```
+
 ### Description
 
 Quiver Framework provides structure and core architecture building blocks for any application.
