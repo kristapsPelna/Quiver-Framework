@@ -25,6 +25,12 @@
       "email": "kristaps.pelna@me.com"
     }
   ],
+  "keywords": [
+    "typescript",
+    "framework",
+    "dependency-injection",
+    "ioc"
+  ],
   "dependencies": {
     "reflect-metadata": "^0.1.9"
   },
