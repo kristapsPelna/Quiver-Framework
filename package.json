@@ -1,6 +1,6 @@
 {
   "name": "quiver-framework",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "scripts": {
     "start": "serve",
     "export": "rimraf dist && tsc && copy readme.md dist",
