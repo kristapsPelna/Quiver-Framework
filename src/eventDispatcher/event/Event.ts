@@ -1,3 +1,4 @@
+
 /**
  * Basic event class which holds event type and data properties and which should be extended
  * by any custom event class.

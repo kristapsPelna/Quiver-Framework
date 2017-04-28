@@ -28,3 +28,5 @@ This Framework utilizes concepts from [Robotlegs](http://www.robotlegs.org/) and
 > [Documentation](https://kristapspelna.github.io/Quiver-Framework/globals.html)
 
 > [NPM package](https://www.npmjs.com/package/quiver-framework)
+
+> [GitHub repository](https://github.com/kristapsPelna/Quiver-Framework)
