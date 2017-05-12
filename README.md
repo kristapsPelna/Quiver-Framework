@@ -3,6 +3,7 @@
 
 [![License MIT](https://img.shields.io/badge/license-mit-blue.svg)](https://github.com/kristapsPelna/Quiver-Framework/blob/master/LICENSE.md)
 [![Build Status](https://travis-ci.org/kristapsPelna/Quiver-Framework.svg?branch=master)](https://travis-ci.org/kristapsPelna/Quiver-Framework)
+[![Coverage Status](https://img.shields.io/coveralls/kristapsPelna/Quiver-Framework/dev.svg)](https://coveralls.io/github/kristapsPelna/Quiver-Framework?branch=dev)
 
 Quiver is a lightweight micro framework for TypeScript/JavaScript.
 
