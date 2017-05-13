@@ -6,6 +6,7 @@ import {CommandMapping} from "./data/CommandMapping";
 import {Inject} from "../metadata/decorator/Inject";
 import {Injector} from "../injector/Injector";
 import {AsyncCommand} from "./command/AsyncCommand";
+import {typeReferenceToString} from "../util/StringUtil";
 
 /**
  * Event command map describes event name to command class mappings and is useful as small pieces of control code
@@ -43,7 +44,7 @@ export class CommandMap {
         for (let mapping of mappings) {
             if (mapping.command == command) {
                 let message:string = "CommandMap: Event to command mapping already exists. UnMap it before calling map again.";
-                let info:string = "event:" + eventType + " command:" + command;
+                let info:string = "event:" + eventType + " command:" + typeReferenceToString(command);
                 console.warn(message + " " + info);
                 return null;
             }
@@ -111,14 +112,14 @@ export class CommandMap {
      * Trigger all commands which are mapped to this event.
      * @param event Event object that defines event type and data
      */
-    trigger(event:Event):void;
+    trigger(event:Event):void|Error;
 
     /**
      * Trigger all commands which are mapped to event name.
      * @param eventType String event name commands mapped to which must be invoked.
      * @param eventData Arbitrary data to be passed along with command invocation.
      */
-    trigger(eventType:string, eventData?:any):void;
+    trigger(eventType:string, eventData?:any):void|Error;
 
     /**
      * Trigger all commands which are mapped to event name.
@@ -126,7 +127,7 @@ export class CommandMap {
      * @param eventData Arbitrary data to be passed along with command invocation.
      * @private
      */
-    trigger(eventTypeOrEvent:Event|string, eventData?:any):void {
+    trigger(eventTypeOrEvent:Event|string, eventData?:any):void|Error {
         if (!eventTypeOrEvent) {
             throw new Error("CommandMap: Event type or value can not be null");
         }

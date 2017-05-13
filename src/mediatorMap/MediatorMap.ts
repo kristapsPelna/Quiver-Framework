@@ -1,4 +1,3 @@
-import {Mediator} from './Mediator';
 import {Type} from "../type/Type";
 import {Inject} from "../metadata/decorator/Inject";
 import {Injector} from "../injector/Injector";
