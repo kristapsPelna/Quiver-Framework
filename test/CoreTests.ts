@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {InjectorTest} from "./injector/InjectorTest";
 import {MetadataTest} from "./metadata/MetadataTest";
 import {EventDispatcherTest} from "./eventDispatcher/EventDispatcherTest";
