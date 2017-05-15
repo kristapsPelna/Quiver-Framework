@@ -55,6 +55,7 @@
     "serve": "5.1.5",
     "systemjs": "0.20.12",
     "typedoc": "0.6.0",
-    "typescript": "2.3.0"
+    "typescript": "2.3.0",
+    "yarn": "^0.24.4"
   }
 }
