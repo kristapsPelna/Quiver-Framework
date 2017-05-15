@@ -1,10 +1,11 @@
-import {suite, test} from "mocha-typescript";
+import {suite, test, timeout} from "mocha-typescript";
 import {expect} from 'chai';
 import {Injector} from "../../src/injector/Injector";
 import {CustomModel} from "./data/CustomModel";
 import {CustomModel2} from "./data/CustomModel2";
 import {CustomModelWithInject} from "./data/CustomModelWithInject";
 import {CustomExtendedModel} from "./data/CustomExtendedModel";
+import {ClassWithInjections} from "../metadata/data/ClassWithInjections";
 
 /**
  * Injector test suite
@@ -19,6 +20,11 @@ import {CustomExtendedModel} from "./data/CustomExtendedModel";
     }
 
     after() {
+        CustomModelWithInject.onDestroy = null;
+        if (!this.injector) {
+            return;
+        }
+
         expect(
             () => this.injector.destroy(),
             "Injector destroy should not cause any errors"
@@ -193,6 +199,24 @@ import {CustomExtendedModel} from "./data/CustomExtendedModel";
         ).to.not.be.null;
     }
 
+    @test("Inject Into")
+    @timeout(500) //Limit waiting time in case the callback is not called
+    injectInto(done:() => void) {
+        expect(
+            () => this.injector.injectInto(new ClassWithInjections()),
+            "An error should be thrown because the injections can not be provided"
+        ).to.throw(Error);
+
+        ClassWithInjections.onPostConstruct = done;
+
+        this.injector.map(CustomModel);
+
+        expect(
+            () => this.injector.injectInto(new ClassWithInjections()),
+            "An error should not be thrown because the injections can be provided"
+        ).to.throw(Error);
+    }
+
     @test("Property injections")
     propertyInjections() {
         let model:CustomModelWithInject = this.injector.instantiateInstance(CustomModelWithInject);
@@ -208,6 +232,62 @@ import {CustomExtendedModel} from "./data/CustomExtendedModel";
             extendedModel.injector,
             "Extended instances should have inherited Inject() properties filled"
         ).to.not.be.undefined;
+    }
+
+    @test("Destroy instance")
+    @timeout(500) //Limit waiting time in case the callback is not called
+    destroyInstance(done:() => void) {
+        let model:CustomModelWithInject = this.injector.instantiateInstance(CustomModelWithInject);
+        CustomModelWithInject.onDestroy = done;
+        this.injector.destroyInstance(model);
+    }
+
+    @test("Destroy instance without metadata")
+    destroyInstanceWithoutMetadata() {
+        this.injector.destroyInstance({});
+    }
+
+    @test("Destroy injector")
+    destroyInjector(done:() => void) {
+        this.injector.map(CustomModelWithInject).asSingleton();
+        this.injector.get(CustomModelWithInject);
+
+        CustomModelWithInject.onDestroy = done;
+
+        this.injector.destroy();
+
+        const methods:Function[] = [
+            () => this.injector.createSubInjector(),
+            () => this.injector.map(null),
+            () => this.injector.unMap(null),
+            () => this.injector.hasDirectMapping(null),
+            () => this.injector.hasMapping(null),
+            () => this.injector.getMapping(null),
+            () => this.injector.get(null),
+            () => this.injector.instantiateInstance(null),
+            () => this.injector.injectInto(null),
+            () => this.injector.destroyInstance(null)
+        ];
+        for (let method of methods) {
+            expect(
+                method,
+                "Accessing a destroyed injector functionality should throw an error"
+            ).to.throw(Error);
+        }
+
+        this.injector = null;
+    }
+
+    @test("Double destroy injector")
+    doubleDestroyInjector() {
+        this.injector.destroy();
+
+        expect(
+            () => this.injector.destroy(),
+            "Trying to destroy a destroyed injector should throw an error"
+        ).to.throw(Error);
+
+        this.injector = null;
     }
 
 }

@@ -53,6 +53,7 @@ export class Injector extends EventDispatcher {
      * @returns {Injector}
      */
     createSubInjector():Injector {
+        this.throwErrorIfDestroyed();
         return new Injector(this);
     }
 
@@ -64,9 +65,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if attempt to override sealed mapping is encountered
      */
     map(type:Type<any>):InjectionMapping {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (this.hasDirectMapping(type)) {
             let existingMapping:InjectionMapping = this.getMapping(type);
@@ -95,17 +94,15 @@ export class Injector extends EventDispatcher {
      * @throws Error if sealed mapping is attempted to be unmapped
      */
     unMap(type:Type<any>):void {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (!this.hasDirectMapping(type)) {
-            throw new Error(`Injector error: no mapping could be located for ${typeReferenceToString(type)} as unmap is attempted!`);
+            throw new Error(`Injector error: no mapping could be located for ${typeReferenceToString(type)} as unMap is attempted!`);
         }
 
         let mapping:InjectionMapping = this.getMapping(type);
         if (mapping.sealed) {
-            throw new Error(`Injector error: cannot unmap sealed mapping of type: ${typeReferenceToString(type)}!`);
+            throw new Error(`Injector error: cannot unMap sealed mapping of type: ${typeReferenceToString(type)}!`);
         }
 
         //Destroy mapping
@@ -121,9 +118,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if method i invoked on destroyed instance
      */
     hasDirectMapping(type:Type<any>):boolean {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         return this.mappings.has(type);
     }
@@ -135,9 +130,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if method i invoked on destroyed instance
      */
     hasMapping(type:Type<any>):boolean {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         let injector:Injector = this;
         do {
@@ -164,9 +157,7 @@ export class Injector extends EventDispatcher {
      * @throws Error when no mapping was found for the specified dependency
      */
     getMapping(type:Type<any>):InjectionMapping {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (!this.hasDirectMapping(type)) {
             throw new Error(`Injector error: no mapping could be located for ${typeReferenceToString(type)}`);
@@ -182,9 +173,7 @@ export class Injector extends EventDispatcher {
      * @throws Error when no mapping was found for the specified dependency
      */
     get(type:Type<any>):any {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (!this.hasMapping(type)) {
             throw new Error(`There are no known mapping for ${typeReferenceToString(type)} type in Injector!`);
@@ -215,9 +204,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if some Injector mapping could not be found.
      */
     instantiateInstance(type:Type<any>):any {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         //There is no metadata for type - simply create instance with no constructor arguments
         if (!metadata.hasMetadata(type)) {
@@ -256,9 +243,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if some Injector mapping could not be found.
      */
     injectInto(target:any):any {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
         //There are no metadata for given type - do nothing
@@ -271,7 +256,7 @@ export class Injector extends EventDispatcher {
 
         //Join definitions of property injections and post construct methods from all inherited meta
         for (let meta of inheritedMetadata) {
-            for(let injection of meta.propertyInjections) {
+            for (let injection of meta.propertyInjections) {
                 if (!propertyInjections.has(injection.name)) {
                     propertyInjections.set(injection.name, injection);
                     //If there are several definitions where one is optional and other not - use it as optional
@@ -280,7 +265,7 @@ export class Injector extends EventDispatcher {
                 }
             }
 
-            for(let method of meta.postConstructMethods) {
+            for (let method of meta.postConstructMethods) {
                 if (postConstructMethods.indexOf(method) === -1) {
                     postConstructMethods.push(method);
                 }
@@ -298,13 +283,14 @@ export class Injector extends EventDispatcher {
             }
         });
 
+
+
         //Invoke post construct methods, if there are any
         for (let method of postConstructMethods) {
             target[method]();
         }
 
         return target;
-
     }
 
     /**
@@ -312,13 +298,12 @@ export class Injector extends EventDispatcher {
      * @param target instance of injected values client
      * @throws Error in case if method is invoked on destroyed instance
      */
-    destroyInstance(target:any):void {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+    destroyInstance(target:any):void|Error {
+        this.throwErrorIfDestroyed();
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
         //There are no metadata for given type - do nothing
+
         if (!inheritedMetadata) {
             return;
         }
@@ -344,10 +329,8 @@ export class Injector extends EventDispatcher {
      * Destroy injector and all of its direct mappings.
      * @throws Error in case if Injector is already destroyed
      */
-    destroy():void {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+    destroy():void|Error {
+        this.throwErrorIfDestroyed();
 
         //Remove all mappings
         this.mappings.forEach((mapping:InjectionMapping, type:Type<any>) => {
@@ -358,5 +341,14 @@ export class Injector extends EventDispatcher {
         });
 
         this._destroyed = true;
+    }
+
+    /**
+     * Throw error if Injector is already destroyed.
+     */
+    private throwErrorIfDestroyed():void {
+        if (this._destroyed) {
+            throw new Error("Injector instance is already destroyed!");
+        }
     }
 }

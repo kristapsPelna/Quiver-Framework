@@ -14,7 +14,7 @@ export class CustomMacroCommand extends MacroCommand {
     /**
      * Async test callback function
      */
-    static done:Function;
+    static done:() => void;
 
     private commandOrder:Type<Command|AsyncCommand>[] = [
         CustomAsyncCommand,

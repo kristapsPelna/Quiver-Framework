@@ -31,6 +31,9 @@ import {CustomInjectedClass} from "./CustomInjectedClass";
         }
     ]
 })
+//Test an empty MapInterface
+@MapInterface()
+//Test a full MapInterface
 @MapInterface(CustomInterface)
 export class CustomModuleWithMetatags implements CustomInterface {
 
@@ -41,7 +44,12 @@ export class CustomModuleWithMetatags implements CustomInterface {
     @Inject()
     private injector:Injector;
 
-    constructor(customClass:CustomInjectedClass, injector:Injector) {
+    @Optional()
+    get intentionallyIncorrectOptionalMetatagUse():null {
+        return null;
+    }
+
+    constructor(injector:Injector, @Optional() customClass:CustomInjectedClass) {
 
     }
 

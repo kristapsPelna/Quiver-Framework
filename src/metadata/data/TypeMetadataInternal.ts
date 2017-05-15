@@ -1,9 +1,10 @@
 import {Type} from "../../type/Type";
 import {ModuleDescriptor} from "./ModuleDescriptor";
+import {typeReferenceToString} from "../../util/StringUtil";
 /**
  * Data object which holds raw information collected for particular Type from class metadataInternal decorators.
  * This is internal class of metadataInternal package and should never be used outside of it.
- * @author Jānis Radiņš
+ * @author Jānis Radiņš / Kristaps Peļņa
  */
 export class TypeMetadataInternal {
 
@@ -22,9 +23,9 @@ export class TypeMetadataInternal {
      * Create new instance
      * @param type Type of class prototype this instance holds metadataInternal for
      */
-    constructor(
-        public readonly type:Type<any>
-    ) {}
+    constructor(public readonly type:Type<any>) {
+
+    }
 
     //-----------------------
     //  Public properties
@@ -101,57 +102,57 @@ export class TypeMetadataInternal {
     //  Public methods
     //-----------------------
 
-    setConstructorArguments(value: Type<any>[]):void {
+    setConstructorArguments(value: Type<any>[]):void|Error {
         if (this._constructorArguments) {
             throw new Error("Double set of type constructor arguments is attempted and that is clear error!");
         }
         this._constructorArguments = value;
     }
 
-    setOptionalConstructorArgument(index:number):void {
+    setOptionalConstructorArgument(index:number):void|Error {
         if (this._optionalConstructorArguments.indexOf(index) !== -1) {
             throw new Error("Double set of optional constructor argument!");
         }
         this._optionalConstructorArguments.push(index);
     }
 
-    addPropertyInjection(name:string, type:Type<any>):void {
+    addPropertyInjection(name:string, type:Type<any>):void|Error {
         if (this._propertyInjections.get(name)) {
-            throw new Error(`Double set of property ${name} injection to ${type}`);
+            throw new Error(`Double set of property ${name} injection to ${typeReferenceToString(type)}`);
         }
 
         this._propertyInjections.set(name, type);
     }
 
-    setOptionalPropertyInjection(name:string):void {
+    setOptionalPropertyInjection(name:string):void|Error {
         if (this._optionalPropertyInjections.indexOf(name) !== -1) {
             throw new Error("Double set of optional proprety injection!");
         }
         this._optionalPropertyInjections.push(name);
     }
 
-    addPostConstructMethod(name:string):void {
+    addPostConstructMethod(name:string):void|Error {
         if (this._postConstructMethods.indexOf(name) !== -1) {
-            throw new Error(`Double register of post construct method ${name} to ${this.type}`);
+            throw new Error(`Double register of post construct method ${name} to ${typeReferenceToString(this.type)}`);
         }
         this._postConstructMethods.push(name);
     }
 
-    addPreDestroyMethod(name:string):void {
+    addPreDestroyMethod(name:string):void|Error {
         if (this._preDestroyMethods.indexOf(name) !== -1) {
-            throw new Error(`Double register of pre destroy method ${name} to ${this.type}`);
+            throw new Error(`Double register of pre destroy method ${name} to ${typeReferenceToString(this.type)}`);
         }
         this._preDestroyMethods.push(name);
     }
 
-    setMappedInterfaces(value: Type<any>[]):void {
+    setMappedInterfaces(value: Type<any>[]):void|Error {
         if (this._mappedInterfaces.length > 0) {
             throw new Error("Double set of mapped interfaces is attempted and that is clear error!");
         }
         this._mappedInterfaces = value;
     }
 
-    setModuleDescriptor(descriptor:ModuleDescriptor):void {
+    setModuleDescriptor(descriptor:ModuleDescriptor):void|Error {
         if (this._moduleDescriptor) {
             throw new Error("Double set of module descriptor and that is clear error!");
         }

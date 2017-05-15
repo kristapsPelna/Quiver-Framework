@@ -9,7 +9,7 @@ export class RequiredModule {
     /**
      * Command called on successful construction.
      */
-    static constructionCallback:Function;
+    static constructionCallback:() => void;
 
     constructor() {
         RequiredModule.constructionCallback();
