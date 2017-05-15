@@ -3,10 +3,12 @@ sudo: false
 cache: yarn
 node_js:
 - '7'
+before_deploy: "npm run export"
 deploy:
   provider: releases
   api_key:
     secure: YzgzR6ckvCpqQ7iADKCQK3esuForJMsX/PD7ht6Zi3PDpDQMj6s1fHsv+qXC1P70bj0cr1Tw+2ktWLYLKiWJj0DxTDvSN5OIFAyrxfZiFVfxhj+dg7FlYPTJshOh6a1MfIDlrmcm5eWTr3+BKYhpGrXNHQperRa8O1270Nwfukd8Y+F7y/xaaThcsRNZMLx2cpep0aXT8DU4iTca+RmeHKGKZPc+u7IP0aCqo3+3YuZ2YjWJvgdjFkSvY150ggtNso7vvkmGTzq/vg5ilLhgQ/f3iX6lPOubR+2yZy4yotcEXITdkO3oM4Ky9LNRRVZcBsaNFcvCQmuS86zJzrtULWjzkNaXHetpgKatbs+3HSqEKlC5pC5zFCCoztAgoaI58A04xjoW9rA6LhLw8TflalZXpgU8svZcVB75h9kHgqdZxg3ZEufeuIj2zpzCQ1gK1uALkqhIvO8wTmx+BdykYQ3hdJbm8lvCX/Qut4dMoLBIYl2wOk4Lsk1sDJwC0/FnSkwTAqRl6T5jlJ/RzIbdkEjzL2sCUh4lCGwFvEgRonN4dx5PqOMCBcdhGzoxQ8UHWxAT1YfvHCFKe1vSJTGqXEdB5YEf3zEO6DPp+3KXQcjY+x05UJIsvIxgsrQeOTS5TJGBaCTJUlk/pDvZHV88I3xCxQPdHhAZ2xRu4zf2g8k=
-  file: ''
+  file: 'dist/**'
+  skip_cleanup: true
   on:
     tags: true
