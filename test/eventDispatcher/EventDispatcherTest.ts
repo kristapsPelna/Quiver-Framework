@@ -4,6 +4,7 @@ import {EventDispatcher} from "../../src/eventDispatcher/EventDispatcher";
 import {EventListener} from "../../src/eventDispatcher/api/EventListener";
 import {CustomEvent} from "./data/CustomEvent";
 import {EventGuard} from "../../src/eventDispatcher/api/EventGuard";
+import {Event} from "../../src/eventDispatcher/event/Event";
 
 /**
  * EventDispatcher test suite
@@ -153,6 +154,14 @@ import {EventGuard} from "../../src/eventDispatcher/api/EventGuard";
             this.eventDispatcher.listenerCount,
             "Event dispatcher should not have any listeners"
         ).be.eq(0);
+    }
+
+    @test("Event toString validation")
+    eventToStringValidation() {
+        const eventName:string = "Test Event";
+        expect(
+            new Event(eventName).toString()
+        ).to.be.eq("[Event type=" + eventName + ", data=undefined]")
     }
 
     @test("Event dispatch with data")

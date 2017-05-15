@@ -23,11 +23,9 @@ export class InjectionMapping {
      * @param type Mapping type of injected value by which it will be requested from injector
      * @param injector Hosting Injector instance of current mapping
      */
-    constructor(
-        public readonly type:Type<any>,
-        public readonly injector:Injector,
-        private readonly masterSealKey:Object
-    ) {
+    constructor(public readonly type:Type<any>,
+                public readonly injector:Injector,
+                private readonly masterSealKey:Object) {
         this.defaultProviderSet = true;
         //Set class provider as a default value provider
         this.setProvider(new ClassProvider(injector, type));
@@ -152,7 +150,7 @@ export class InjectionMapping {
     /**
      * Destroy injection provider and invoke clearCommandMap of values provided if current value type supports that.
      */
-    destroy():void {
+    destroy():void|Error {
         if (this._destroyed) {
             throw new Error(`InjectionMapping for type: ${this.type} is already destroyed!`);
         }
@@ -168,7 +166,7 @@ export class InjectionMapping {
     //  Private methods
     //------------------------------
 
-    private setProvider(provider:InjectionValueProvider):void {
+    private setProvider(provider:InjectionValueProvider):void|Error {
         if (this._destroyed) {
             throw new Error(`Can't change a destroyed mapping`);
         }

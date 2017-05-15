@@ -7,7 +7,6 @@ import {EventGuard} from "../../src/eventDispatcher/api/EventGuard";
 import {CustomMacroCommand} from "./data/CustomMacroCommand";
 import {Injector} from "../../src/injector/Injector";
 import {Event} from "../../src/eventDispatcher/event/Event";
-import {CommandMapping} from "../../src/commandMap/data/CommandMapping";
 import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingImpl";
 
 /**
@@ -67,7 +66,7 @@ import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingI
 
     @test("Map command")
     @timeout(500) //Limit waiting time in case the callback is not called
-    mapCommand(done:Function) {
+    mapCommand(done:() => void) {
         const eventName:string = "test";
         CustomCommand.done = done;
 
@@ -149,7 +148,7 @@ import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingI
 
     @test("Map command with successful guard")
     @timeout(500) //Limit waiting time in case the callback is not called
-    mapCommandWithSuccessfulGuard(done:Function) {
+    mapCommandWithSuccessfulGuard(done:() => void) {
         const eventName:string = "test";
         const guard:EventGuard = () => {
             return true;
@@ -319,7 +318,7 @@ import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingI
 
     @test("Macro command execute")
     @timeout(500) //Limit waiting time in case the callback is not called
-    macroCommandExecute(done:Function) {
+    macroCommandExecute(done:() => void) {
         const eventName:string = "test";
         CustomMacroCommand.done = done;
 
