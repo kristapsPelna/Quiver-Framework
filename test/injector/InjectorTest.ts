@@ -6,6 +6,7 @@ import {CustomModel2} from "./data/CustomModel2";
 import {CustomModelWithInject} from "./data/CustomModelWithInject";
 import {CustomExtendedModel} from "./data/CustomExtendedModel";
 import {ClassWithInjections} from "../metadata/data/ClassWithInjections";
+import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
 
 /**
  * Injector test suite
@@ -184,6 +185,44 @@ import {ClassWithInjections} from "../metadata/data/ClassWithInjections";
         ).to.throw(Error);
     }
 
+    @test("Seal")
+    seal() {
+        const mapping:InjectionMapping = this.injector.map(CustomModel);
+        mapping.seal();
+
+        expect(
+            () => mapping.asSingleton(),
+            "Changing sealed mappings should throw an error"
+        ).to.throw(Error);
+    }
+
+    @test("Unseal")
+    unseal() {
+        const mapping:InjectionMapping = this.injector.map(CustomModel);
+
+        expect(
+            () => mapping.unseal(null),
+            "Trying to unseal a not sealed mapping should throw an error"
+        ).to.throw(Error);
+
+        mapping.seal();
+
+        expect(
+            () => mapping.unseal(null),
+            "Trying to unseal a mapping with an incorrect key should throw an error"
+        ).to.throw(Error);
+    }
+
+    @test("Remapping")
+    remapping() {
+        const mapping:InjectionMapping = this.injector.map(CustomModel2).asSingleton();
+
+        expect(
+            () => mapping.toValue(new CustomModel()),
+            "Remapping should not throw an error"
+        ).to.not.throw(Error);
+    }
+
     @test("Instantiate instance")
     instantiateInstance() {
         let model:any = this.injector.instantiateInstance(CustomModel);
@@ -232,6 +271,31 @@ import {ClassWithInjections} from "../metadata/data/ClassWithInjections";
             extendedModel.injector,
             "Extended instances should have inherited Inject() properties filled"
         ).to.not.be.undefined;
+    }
+
+    @test("Destroy mapping")
+    destroyMapping() {
+        const mapping:InjectionMapping = this.injector.map(CustomModel);
+
+        expect(
+            () => mapping.destroy(),
+            "Destroying a mapping should work"
+        ).to.not.throw(Error);
+
+        expect(
+            () => mapping.destroy(),
+            "Double destroying a mapping should throw an error"
+        ).to.throw(Error);
+
+        expect(
+            () => mapping.asSingleton(),
+            "Changing mapping providers after destroy should throw an error"
+        ).to.throw(Error);
+
+        expect(
+            () => mapping.getInjectedValue(),
+            "Accessing getInjectedValue destroy should throw an error"
+        ).to.throw(Error);
     }
 
     @test("Destroy instance")

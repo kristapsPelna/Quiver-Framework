@@ -106,7 +106,10 @@ export class Injector extends EventDispatcher {
         }
 
         //Destroy mapping
-        mapping.destroy();
+        if (!mapping.destroyed) {
+            mapping.destroy();
+        }
+
         this.mappings.delete(type);
         this.dispatchEvent(new MappingEvent(MappingEvent.MAPPING_DESTROYED, type, mapping));
     }
@@ -303,7 +306,6 @@ export class Injector extends EventDispatcher {
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
         //There are no metadata for given type - do nothing
-
         if (!inheritedMetadata) {
             return;
         }
