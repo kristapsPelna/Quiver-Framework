@@ -13,5 +13,5 @@ export function Injectable():Function {
             metadataInternal.getTypeDescriptor(target).setConstructorArguments(constructorArgs);
         }
         return target;
-    }
+    };
 }

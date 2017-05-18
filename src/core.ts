@@ -39,4 +39,3 @@ export * from "./metadata/decorator/PreDestroy";
 export * from "./type/Type";
 
 export * from "./util/StringUtil";
-

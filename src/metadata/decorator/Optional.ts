@@ -18,5 +18,5 @@ export function Optional():Function {
         }
 
         return target;
-    }
+    };
 }

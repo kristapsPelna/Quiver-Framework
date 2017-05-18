@@ -1,10 +1,11 @@
 import {Event} from "../../eventDispatcher/event/Event";
 import {ModuleDescriptor} from "../../metadata/data/ModuleDescriptor";
 import {Context} from "../Context";
+import {Type} from "../../type/Type";
 
 /**
  * Context module action event
- * @author Jānis Radiņš
+ * @author Jānis Radiņš / Kristaps Peļņa
  */
 export class ContextModuleEvent extends Event {
 
@@ -22,7 +23,8 @@ export class ContextModuleEvent extends Event {
      */
     constructor(type:string,
                 public readonly context:Context,
-                public readonly moduleDescriptor:ModuleDescriptor){
+                public readonly moduleType:Type<any>,
+                public readonly moduleDescriptor:ModuleDescriptor) {
         super(type);
     }
 }

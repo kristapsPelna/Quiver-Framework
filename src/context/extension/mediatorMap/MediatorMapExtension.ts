@@ -17,7 +17,7 @@ export class MediatorMapExtension implements ContextExtension {
 
         context.injector.map(MediatorMap).asSingleton().seal();
 
-        this.mediatorMap = context.injector.get(MediatorMap)
+        this.mediatorMap = context.injector.get(MediatorMap);
 
         //TODO: Add mediator map clear functionality as context is destroyed
         context.listenOnce(ContextLifecycleEvent.POST_INITIALIZE, this.removeInitListeners, this);

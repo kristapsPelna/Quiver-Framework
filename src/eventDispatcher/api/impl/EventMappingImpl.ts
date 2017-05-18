@@ -28,7 +28,7 @@ export class EventMappingImpl implements EventMapping {
      */
     constructor(public readonly event:string,
                 public readonly listener:EventListener,
-                public readonly context:Object){
+                public readonly context:Object) {
     }
 
     /**

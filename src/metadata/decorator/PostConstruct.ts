@@ -9,5 +9,5 @@ export function PostConstruct():Function {
     return (target:Type<any>, method:string):Type<any> => {
         metadataInternal.getTypeDescriptor(<Type<any>> target.constructor).addPostConstructMethod(method);
         return target;
-    }
+    };
 }

@@ -82,6 +82,26 @@ import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
         ).to.be.eq(model);
     }
 
+    @test("Map to singleton")
+    mapToSingleton() {
+        this.injector.map(CustomModel2).toSingleton(CustomModel);
+
+        expect(
+            this.injector.get(CustomModel2),
+            "CustomModel2 mapped to CustomModel should return instance of CustomModel"
+        ).to.be.instanceof(CustomModel);
+    }
+
+    @test("Map to type")
+    mapToType() {
+        this.injector.map(CustomModel2).toType(CustomModel);
+
+        expect(
+            this.injector.get(CustomModel2),
+            "CustomModel2 mapped to CustomModel should return instance of CustomModel"
+        ).to.be.instanceof(CustomModel);
+    }
+
     @test("Map to value")
     mapToValue() {
         let model:CustomModel = new CustomModel();

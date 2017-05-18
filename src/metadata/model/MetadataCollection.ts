@@ -34,7 +34,7 @@ export class MetadataCollection {
             throw new Error(`Type metadata for ${type} is not registered`);
         }
 
-        if(!this.exportedTypeMetadata.has(type)) {
+        if (!this.exportedTypeMetadata.has(type)) {
             this.exportedTypeMetadata.set(type, new TypeMetadata(this.rawTypeMetadata.get(type)));
         }
         return this.exportedTypeMetadata.get(type);

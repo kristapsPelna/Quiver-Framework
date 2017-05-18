@@ -42,7 +42,7 @@ export class CommandMap {
         }
         let mappings:CommandMappingImpl[] = this.getEventToCommandMappings(eventType);
         for (let mapping of mappings) {
-            if (mapping.command == command) {
+            if (mapping.command === command) {
                 let message:string = "CommandMap: Event to command mapping already exists. UnMap it before calling map again.";
                 let info:string = "event:" + eventType + " command:" + typeReferenceToString(command);
                 console.warn(message + " " + info);
@@ -158,10 +158,10 @@ export class CommandMap {
     private getEventToCommandMappings(eventType:string, command?:Type<Command>):CommandMappingImpl[] {
         let mappings:CommandMappingImpl[] = [];
         for (let mapping of this.commandMappings) {
-            if (mapping.eventType != eventType){
+            if (mapping.eventType !== eventType) {
                 continue;
             }
-            if (command && mapping.command != command) {
+            if (command && mapping.command !== command) {
                 continue;
             }
             mappings.push(mapping);
@@ -217,4 +217,3 @@ export class CommandMap {
         return this.commandMappings.length;
     }
 }
-

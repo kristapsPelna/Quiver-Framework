@@ -17,4 +17,3 @@ export class ValueProvider implements InjectionValueProvider {
         this.value = null;
     }
 }
-

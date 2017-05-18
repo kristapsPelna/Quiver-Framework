@@ -41,7 +41,7 @@ export class InjectionMapping {
      * Whether injection is sealed
      * @returns {boolean}
      */
-    get sealed(): boolean {
+    get sealed():boolean {
         return this._sealed;
     }
 
@@ -49,7 +49,7 @@ export class InjectionMapping {
      * Whether injection is destroyed
      * @returns {boolean}
      */
-    get destroyed(): boolean {
+    get destroyed():boolean {
         return this._destroyed;
     }
 
@@ -126,7 +126,7 @@ export class InjectionMapping {
      * @returns {InjectionMapping} The InjectionMapping the method is invoked on
      */
     unseal(key:Object):this {
-        if (!this._sealed){
+        if (!this._sealed) {
             throw new Error(`Can't unseal a non-sealed mapping.`);
         }
         if (key !== this.sealKey && key !== this.masterSealKey) {

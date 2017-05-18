@@ -19,7 +19,7 @@ export const metadataInternal = {
     getTypeDescriptor: (type: Type<any>):TypeMetadataInternal => {
         return metadataCollection.getOrCreateTypeMetadata(type);
     }
-}
+};
 
 /**
  * Public data provider for registered type metadata
@@ -52,4 +52,4 @@ export const metadata = {
     getInheritedMetadata(instance:any):TypeMetadata[] {
         return metadataCollection.getInheritedMetadata(instance);
     }
-}
+};

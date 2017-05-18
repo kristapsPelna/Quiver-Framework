@@ -10,6 +10,7 @@ import {Injector} from "../../../src/injector/Injector";
 import {PostConstruct} from "../../../src/metadata/decorator/PostConstruct";
 import {PreDestroy} from "../../../src/metadata/decorator/PreDestroy";
 import {CustomInjectedClass} from "./CustomInjectedClass";
+import {CustomCommand} from "../../commandMap/data/CustomCommand";
 /**
  * Custom module class for tests
  * @author Kristaps Peļņa
@@ -28,6 +29,13 @@ import {CustomInjectedClass} from "./CustomInjectedClass";
         {
             map: CustomModel2,
             useExisting: CustomModel
+        }
+    ],
+    commandMap:[
+        {
+            event: "Test",
+            command: CustomCommand,
+            once: true
         }
     ]
 })

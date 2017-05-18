@@ -17,7 +17,6 @@ export class EventDispatcherForCommandMap extends EventDispatcher {
     dispatchEventImpl(event:Event):boolean {
         this.commandMap.trigger(event);
         return super.dispatchEventImpl(event);
-
     }
 
 }

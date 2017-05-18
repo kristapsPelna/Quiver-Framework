@@ -9,10 +9,12 @@
     "build:patch": "npm run localTest && npm run export && npm version patch && copy package.json dist && npm publish dist",
     "build:minor": "npm run localTest && npm run export && npm version minor && copy package.json dist && npm publish dist",
     "build:major": "npm run localTest && npm run export && npm version major && copy package.json dist && npm publish dist",
-    "transpileTest": "tsc -p tsconfig-test.json",
+    "transpileTest": "tsc -p test/tsconfig.json",
     "test": "npm run transpileTest && nyc mocha && nyc report --reporter=json",
     "posttest": "codecov -f coverage/*.json",
     "localTest": "npm run transpileTest && nyc mocha && npm run clean",
+    "lint": "tslint -t stylish src/**/*.ts test/**/*.ts",
+    "lintFix": "tslint -t stylish --fix src/**/*.ts test/**/*.ts",
     "docs": "typedoc --out docs src --mode file --excludePrivate --hideGenerator --name Quiver-Framework",
     "clean": "rimraf src/**/*.d.ts src/**/*.js src/**/*js.map test/**/*.d.ts test/**/*.js test/**/*js.map index.d.ts index.js index.js.map"
   },
@@ -54,6 +56,7 @@
     "rimraf": "2.6.1",
     "serve": "5.1.5",
     "systemjs": "0.20.12",
+    "tslint": "^5.2.0",
     "typedoc": "0.6.0",
     "typescript": "2.3.0"
   }

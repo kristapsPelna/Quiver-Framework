@@ -10,7 +10,7 @@ export class WebApplicationContext extends Context {
 
     constructor() {
         super();
-        this.install(WebApplicationBundle);
+        this.install(...WebApplicationBundle);
     }
 
 }

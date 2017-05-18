@@ -227,7 +227,7 @@ import {Event} from "../../src/eventDispatcher/event/Event";
         const eventName:string = "Test Event";
         expect(
             new Event(eventName).toString()
-        ).to.be.eq("[Event type=" + eventName + ", data=undefined]")
+        ).to.be.eq("[Event type=" + eventName + ", data=undefined]");
     }
 
     @test("Event dispatch with data")
