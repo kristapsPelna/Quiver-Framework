@@ -2,6 +2,7 @@
 
 # Quiver Framework
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/af8411271460492fb3958ba316bf1f48)](https://www.codacy.com/app/kristapsPelna/Quiver-Framework?utm_source=github.com&utm_medium=referral&utm_content=kristapsPelna/Quiver-Framework&utm_campaign=badger)
 [![License MIT](https://img.shields.io/npm/l/quiver-framework.svg)](https://github.com/kristapsPelna/Quiver-Framework/blob/master/LICENSE.md)
 [![Build Status](https://travis-ci.org/kristapsPelna/Quiver-Framework.svg?branch=master)](https://travis-ci.org/kristapsPelna/Quiver-Framework)
 [![Coverage Status](https://img.shields.io/codecov/c/github/kristapsPelna/Quiver-Framework/master.svg)](https://codecov.io/gh/kristapsPelna/Quiver-Framework)
