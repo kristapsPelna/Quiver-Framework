@@ -16,4 +16,3 @@ export function typeReferenceToString(type:Type<any>):string {
     }
     return str;
 }
-

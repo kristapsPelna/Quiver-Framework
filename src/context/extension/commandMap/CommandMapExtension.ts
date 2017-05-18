@@ -19,10 +19,10 @@ export class CommandMapExtension implements ContextExtension {
     private commandMapMapping: InjectionMapping;
     private commandMap: CommandMap;
 
-    extend(context: Context): void {
+    extend(context:Context): void {
         this.context = context;
 
-        //Map default CommandMap implemenation to injector but don't seal it yet before Context is not initialized
+        //Map default CommandMap implementation to injector but don't seal it yet before Context is not initialized
         this.commandMapMapping = context.injector.map(CommandMap).asSingleton();
 
         context.listenOnce(ContextLifecycleEvent.PRE_INITIALIZE, this.mapCustomEventDispatcher, this);
@@ -38,7 +38,9 @@ export class CommandMapExtension implements ContextExtension {
 
     private mapCustomEventDispatcher():void {
         //If default event dispatcher is already mapped - remove it
-        this.context.injector.hasDirectMapping(EventDispatcher) && this.context.injector.unMap(EventDispatcher);
+        if (this.context.injector.hasDirectMapping(EventDispatcher)) {
+            this.context.injector.unMap(EventDispatcher);
+        }
         //And replace it with custom implementation that will forward event dispatches to CommandMap
         this.context.injector.map(EventDispatcher).toSingleton(EventDispatcherForCommandMap);
     }

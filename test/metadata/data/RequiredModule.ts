@@ -12,7 +12,9 @@ export class RequiredModule {
     static constructionCallback:() => void;
 
     constructor() {
-        RequiredModule.constructionCallback();
+        if (RequiredModule.constructionCallback) {
+            RequiredModule.constructionCallback();
+        }
     }
 
 }

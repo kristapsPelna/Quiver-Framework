@@ -57,13 +57,25 @@ import {Event} from "../../src/eventDispatcher/event/Event";
     addListener() {
         const eventName:string = "test";
         const scope:any = this;
-        const callback:EventListener = ():void => {
-            if (this !== scope) {
-                throw new Error("Listener callback scope is not correct");
-            }
-        };
+        const callback:EventListener = () => expect(
+            scope,
+            "Listener callback scope should be this"
+        ).to.be.eq(this);
 
-        this.eventDispatcher.addEventListener(eventName, callback, scope);
+        expect(
+            this.eventDispatcher.addEventListener(eventName, callback, scope),
+            "Add listener should return a new mapping"
+        ).to.be.not.null;
+
+        expect(
+            this.eventDispatcher.addEventListener(eventName, callback, scope),
+            "Adding a listener twice should return null"
+        ).to.be.null;
+
+        expect(
+            () => this.eventDispatcher.addEventListener(eventName, null, scope),
+            "Adding a null listener should throw an error"
+        ).to.throw(Error);
 
         this.verifyListenerExistence(eventName, callback, scope);
 
@@ -128,9 +140,48 @@ import {Event} from "../../src/eventDispatcher/event/Event";
 
         this.eventDispatcher.addEventListener(eventName, callback, scope).once();
 
-        this.eventDispatcher.removeEventListener(eventName, callback, scope);
+        expect(
+            this.eventDispatcher.removeEventListener(eventName, callback, scope),
+            "The event should be successfully removed"
+        ).to.be.true;
 
         this.eventDispatcher.dispatchEvent(eventName);
+
+        expect(
+            this.eventDispatcher.removeEventListener(eventName, callback, scope),
+            "The event should already be removed"
+        ).to.be.false;
+
+        expect(
+            () => this.eventDispatcher.removeEventListener(eventName, null, scope),
+            "Remove lister from null method should throw an error"
+        ).to.throw(Error);
+    }
+
+    @test("Remove listeners")
+    removeListeners() {
+        const eventName:string = "test";
+        const scope:any = this;
+        const callback:EventListener = () => {
+            throw new Error("Callback should not be called if listener has been removed");
+        };
+
+        this.eventDispatcher.addEventListener(eventName, callback, scope).once();
+
+        expect(
+            this.eventDispatcher.removeEventListeners(eventName),
+            "Remove listeners should return true because there was a listener added"
+        ).to.be.true;
+
+        expect(
+            this.eventDispatcher.removeEventListeners(eventName),
+            "Remove listeners should return false because we already removed everything"
+        ).to.be.false;
+
+        expect(
+            this.eventDispatcher.hasEventListener(eventName),
+            "There should not be any listeners after we removed all"
+        ).to.be.false;
     }
 
     @test("Remove all listeners")
@@ -145,15 +196,30 @@ import {Event} from "../../src/eventDispatcher/event/Event";
         this.eventDispatcher.addEventListener(eventName, callback, scope);
         this.eventDispatcher.addEventListener(eventName2, callback);
 
-        this.eventDispatcher.removeAllEventListeners();
+        expect(
+            this.eventDispatcher.removeAllEventListeners(scope),
+            "Remove all listeners from the scope should be successful"
+        ).to.be.true;
 
-        this.eventDispatcher.dispatchEvent(eventName);
-        this.eventDispatcher.dispatchEvent(eventName2);
+        expect(
+            this.eventDispatcher.listenerCount,
+            "Event dispatcher should have only one listener without the scope"
+        ).be.eq(1);
+
+        this.eventDispatcher.addEventListener(eventName, callback, scope);
+
+        expect(
+            this.eventDispatcher.removeAllEventListeners(),
+            "Remove all listeners from all scopes should be successful"
+        ).to.be.true;
 
         expect(
             this.eventDispatcher.listenerCount,
             "Event dispatcher should not have any listeners"
         ).be.eq(0);
+
+        this.eventDispatcher.dispatchEvent(eventName);
+        this.eventDispatcher.dispatchEvent(eventName2);
     }
 
     @test("Event toString validation")
@@ -161,7 +227,7 @@ import {Event} from "../../src/eventDispatcher/event/Event";
         const eventName:string = "Test Event";
         expect(
             new Event(eventName).toString()
-        ).to.be.eq("[Event type=" + eventName + ", data=undefined]")
+        ).to.be.eq("[Event type=" + eventName + ", data=undefined]");
     }
 
     @test("Event dispatch with data")

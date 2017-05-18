@@ -8,6 +8,7 @@ import {CustomMacroCommand} from "./data/CustomMacroCommand";
 import {Injector} from "../../src/injector/Injector";
 import {Event} from "../../src/eventDispatcher/event/Event";
 import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingImpl";
+import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
 /**
  * CommandMap test suite
@@ -314,6 +315,53 @@ import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingI
                 "Triggering CommandMap with an invalid value should throw an error. value: " + value
             ).to.throw(Error);
         }
+    }
+
+    @test("Macro command add")
+    macroCommandAdd() {
+        const macroCommand:MacroCommand = new MacroCommand();
+        macroCommand.add(CustomCommand);
+
+        expect(
+            macroCommand.has(CustomCommand),
+            "Macro command should have CustomCommand"
+        ).to.be.true;
+
+        expect(
+            macroCommand.has(CustomCommand2),
+            "Macro command should not have CustomCommand2"
+        ).to.be.false;
+
+        expect(
+            () => macroCommand.add(null),
+            "Trying to add a null command should throw an error"
+        ).to.throw(Error);
+    }
+
+    @test("Macro command remove")
+    macroCommandRemove() {
+        const macroCommand:MacroCommand = new MacroCommand();
+        macroCommand.add(CustomCommand);
+
+        expect(
+            () => macroCommand.remove(CustomCommand),
+            "Removing the command should be successful"
+        ).to.not.throw(Error);
+
+        expect(
+            macroCommand.has(CustomCommand),
+            "Macro command should not have CustomCommand after remove"
+        ).to.be.false;
+
+        expect(
+            () => macroCommand.remove(CustomCommand),
+            "Trying to remove a command which is not added should throw an error"
+        ).to.throw(Error);
+
+        expect(
+            () => macroCommand.remove(null),
+            "Trying to remove a null command should throw an error"
+        ).to.throw(Error);
     }
 
     @test("Macro command execute")

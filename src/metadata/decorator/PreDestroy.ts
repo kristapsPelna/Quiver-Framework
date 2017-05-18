@@ -9,5 +9,5 @@ export function PreDestroy():Function {
     return (target:Type<any>, method:string):Type<any> => {
         metadataInternal.getTypeDescriptor(<Type<any>> target.constructor).addPreDestroyMethod(method);
         return target;
-    }
+    };
 }

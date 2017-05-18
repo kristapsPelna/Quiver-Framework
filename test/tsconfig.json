@@ -11,7 +11,7 @@
     "declaration": true
   },
   "include": [
-    "./test/**/*",
-    "./node_modules/reflect-metadata/reflect-metadata.d.ts"
+    "./**/*",
+    "./../node_modules/reflect-metadata/reflect-metadata.d.ts"
   ]
 }

@@ -27,7 +27,7 @@ export class MediatorMap {
         for (let mapping of this.mappings) {
             if (mapping.type === type && mapping.mediator === mediator) {
                 //Return false if that mapping is found.
-                console.warn("MediatorMap: Duplicate mapping of ", typeReferenceToString(type), "to", typeReferenceToString(mediator))
+                console.warn("MediatorMap: Duplicate mapping of ", typeReferenceToString(type), "to", typeReferenceToString(mediator));
                 return false;
             }
         }        
@@ -44,7 +44,7 @@ export class MediatorMap {
     unMap(type:Type<any>|any, mediator:Type<any>):boolean {
         //Look for mediator mapping for type and mediator
         for (let mapping of this.mappings) {
-            if (mapping.type == type && mapping.mediator == mediator) {
+            if (mapping.type === type && mapping.mediator === mediator) {
                 //Remove mapping                
                 this.mappings.splice(this.mappings.indexOf(mapping), 1);
                 return true;
@@ -155,9 +155,8 @@ export class MediatorMap {
             }
 
             //TODO JR: This one is old-school and should be removed at some point as static isInstanceOf() is not encouraged
-            if ('isInstanceOf' in mapping.type && mapping.type['isInstanceOf'](instance) == true){
+            if ('isInstanceOf' in mapping.type && mapping.type['isInstanceOf'](instance) === true) {
                 mappings.push(mapping);
-                continue;
             }
         }
 
@@ -177,7 +176,7 @@ type MediatorMapping = {
      * Mediator type to be created as mediator should be created
      */
     readonly mediator:Type<any>;
-}
+};
 
 /**
  * Describes instance to created mediator mapping
@@ -191,4 +190,4 @@ type MediatorData = {
      * Mediator instance
      */
     readonly mediator:any
-}
+};

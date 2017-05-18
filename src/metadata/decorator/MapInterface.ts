@@ -11,5 +11,5 @@ export function MapInterface(... interfaces:Type<any>[]):Function {
             metadataInternal.getTypeDescriptor(target).setMappedInterfaces(interfaces);
         }
         return target;
-    }
+    };
 }

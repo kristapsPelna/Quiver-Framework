@@ -13,7 +13,7 @@ import {PropertyInjection} from "../metadata/data/PropertyInjection";
  */
 export class Injector extends EventDispatcher {
 
-    private readonly MASTER_SEAL_KEY:Object = (Math.random() * 0xFFFFFFFF).toString(16);
+    private readonly MASTER_SEAL_KEY:String = (Math.random() * 0xFFFFFFFF).toString(16);
 
     private _destroyed:boolean = false;
 
@@ -106,7 +106,10 @@ export class Injector extends EventDispatcher {
         }
 
         //Destroy mapping
-        mapping.destroy();
+        if (!mapping.destroyed) {
+            mapping.destroy();
+        }
+
         this.mappings.delete(type);
         this.dispatchEvent(new MappingEvent(MappingEvent.MAPPING_DESTROYED, type, mapping));
     }
@@ -217,8 +220,7 @@ export class Injector extends EventDispatcher {
 
         //Collect array of constructor arguments, if there are any
         const constructorArgs:any[] = [];
-        for (let i:number = 0; i < typeMeta.constructorArguments.length; i++) {
-            let argData:ConstructorArg = typeMeta.constructorArguments[i];
+        for (let argData of typeMeta.constructorArguments) {
             let mappingIsPresent:boolean = this.hasMapping(argData.type);
             if (!mappingIsPresent && !argData.isOptional) {
                 throw new Error(`Constructor argument of type: ${typeReferenceToString(argData.type)} for ${typeReferenceToString(type)} could not be found in Injector!`);
@@ -276,14 +278,14 @@ export class Injector extends EventDispatcher {
         propertyInjections.forEach((injection:PropertyInjection) => {
             let mappingIsPresent:boolean = this.hasMapping(injection.type);
             if (!mappingIsPresent && !injection.isOptional) {
-                throw new Error(`Injected property of type: ${typeReferenceToString(injection.type)} for ${typeReferenceToString(target.constructor)} could not be found in Injector!`);
+                const typeString:String = typeReferenceToString(injection.type);
+                const classString:String = typeReferenceToString(target.constructor);
+                throw new Error(`Injected property of type: ${typeString} for ${classString} could not be found in Injector!`);
             }
             if (mappingIsPresent) {
                 target[injection.name] = this.get(injection.type);
             }
         });
-
-
 
         //Invoke post construct methods, if there are any
         for (let method of postConstructMethods) {
@@ -303,7 +305,6 @@ export class Injector extends EventDispatcher {
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
         //There are no metadata for given type - do nothing
-
         if (!inheritedMetadata) {
             return;
         }
@@ -312,7 +313,7 @@ export class Injector extends EventDispatcher {
 
         //Join definitions of pre destroy methods from all inherited meta
         for (let meta of inheritedMetadata) {
-            for(let method of meta.preDestroyMethods) {
+            for (let method of meta.preDestroyMethods) {
                 if (preDestroyMethods.indexOf(method) === -1) {
                     preDestroyMethods.push(method);
                 }

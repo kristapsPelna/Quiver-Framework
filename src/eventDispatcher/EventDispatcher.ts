@@ -32,14 +32,19 @@ export class EventDispatcher {
         if (!event) {
             throw new Error("EventDispatcher: Listener can not be added to an invalid event");
         }
-        if (this.getEventMappings(event, listener, scope).length > 0) {
-            let message:string = "EventDispatcher: addListener already has a mapping. Remove it before calling addListener again.";
-            let info:string = "event:" + event + " listener:" + listener + " scope:" + scope;
-            console.warn(message + " " + info);
-            return null;
+        if (!listener) {
+            throw new Error("EventDispatcher: Invalid listener can not be added");
         }
 
-        return this.createMapping(event, listener, scope);
+        if (this.getEventMappings(event, listener, scope).length === 0) {
+            return this.createMapping(event, listener, scope);
+        }
+
+        let message:string = "EventDispatcher: addListener already has a mapping. Remove it before calling addListener again.";
+        let info:string = "event:" + event + " listener:" + listener + " scope:" + scope;
+        console.warn(message + " " + info);
+
+        return null;
     }
 
     /**
@@ -78,8 +83,12 @@ export class EventDispatcher {
         if (!event) {
             throw new Error("EventDispatcher: Listener can not be removed from an invalid event");
         }
+        if (!listener) {
+            throw new Error("EventDispatcher: Invalid listener can not be removed");
+        }
+
         let mappings:EventMappingImpl[] = this.getEventMappings(event, listener, scope);
-        if (mappings.length == 0) {
+        if (mappings.length === 0) {
             //No event name to listener mapping has been found
             return false;
         }
@@ -88,9 +97,7 @@ export class EventDispatcher {
         }
 
         let index:number = this.eventMap.indexOf(mappings[0]);
-        if (index === -1) {
-            throw new Error('Error at removeListener - mapping index is -1');
-        }
+        //The index should always be valid because getEventMappings is getting the mapping from the same array
         this.eventMap.splice(index, 1);
         
         return true;
@@ -173,7 +180,7 @@ export class EventDispatcher {
     private getEventMappings(eventType:string, listener?:EventListener, scope?:Object):EventMappingImpl[] {
         let mappings:EventMappingImpl[] = [];
         for (let mapping of this.eventMap) {
-            if (mapping.event !== eventType) {
+            if (eventType && mapping.event !== eventType) {
                 continue;
             }
             if (listener && mapping.listener !== listener) {

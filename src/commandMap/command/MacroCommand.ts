@@ -67,6 +67,15 @@ export class MacroCommand extends AsyncCommand {
     }
 
     /**
+     * Check if this MacroCommand has a specific commandType
+     * @param commandType
+     * @returns {boolean}
+     */
+    has(commandType:Type<Command>):boolean {
+        return !!this.getSubCommand(commandType);
+    }
+
+    /**
      * Main macro command execution entry.
      */
     execute():void {
