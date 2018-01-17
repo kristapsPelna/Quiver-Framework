@@ -7,6 +7,8 @@
 [![Coverage Status](https://img.shields.io/codecov/c/github/kristapsPelna/Quiver-Framework/master.svg)](https://codecov.io/gh/kristapsPelna/Quiver-Framework)
 [![Package](https://img.shields.io/npm/v/quiver-framework.svg)](https://www.npmjs.com/package/quiver-framework)
 [![Documentation](https://img.shields.io/website-up-down-green-red/https/kristapspelna.github.io/Quiver-Framework.svg?label=Documentation)](https://kristapspelna.github.io/Quiver-Framework)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/badae29437ae4ad1834aa080e39c7285)](https://www.codacy.com/app/kristapsPelna/Quiver-Framework/dashboard)
+[![Codeclimate](https://img.shields.io/codeclimate/github/kristapsPelna/Quiver-Framework.svg)](https://codeclimate.com/github/kristapsPelna/Quiver-Framework)
 
 Quiver is a lightweight micro framework for TypeScript/JavaScript.
 
