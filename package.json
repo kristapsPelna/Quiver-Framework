@@ -41,7 +41,7 @@
     "url": "https://github.com/kristapsPelna/Quiver-Framework"
   },
   "dependencies": {
-    "reflect-metadata": "^0.1.9"
+    "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
     "@types/chai": "3.5.2",
