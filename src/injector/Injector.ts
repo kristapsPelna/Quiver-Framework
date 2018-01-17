@@ -278,7 +278,7 @@ export class Injector extends EventDispatcher {
             }
         }
 
-        // Fill Injected class properties
+        //Fill Injected class properties
         propertyInjections.forEach((injection:PropertyInjection) => {
             let mappingIsPresent:boolean = this.hasMapping(injection.type);
             if (!mappingIsPresent && !injection.isOptional) {

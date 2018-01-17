@@ -10,8 +10,8 @@ export class SingletonProvider implements InjectionValueProvider {
     private instance:any;
 
     constructor(private injector:Injector,
-                private type:Type<any>
-    ) {}
+                private type:Type<any>) {
+    }
 
     getProviderValue():any {
         if (!this.instance) {
