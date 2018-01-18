@@ -7,6 +7,7 @@ import {CustomModelWithInject} from "./data/CustomModelWithInject";
 import {CustomExtendedModel} from "./data/CustomExtendedModel";
 import {ClassWithInjections} from "../metadata/data/ClassWithInjections";
 import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
+import {CustomModelWithPostConstruct} from "./data/CustomModelWithPostConstruct";
 
 /**
  * Injector test suite
@@ -267,13 +268,12 @@ import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
         ).to.throw(Error);
 
         ClassWithInjections.onPostConstruct = done;
-
         this.injector.map(CustomModel);
 
         expect(
             () => this.injector.injectInto(new ClassWithInjections()),
             "An error should not be thrown because the injections can be provided"
-        ).to.throw(Error);
+        ).to.not.throw(Error);
     }
 
     @test("Property injections")
@@ -372,6 +372,23 @@ import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
         ).to.throw(Error);
 
         this.injector = null;
+    }
+
+    @test("Instance must be available in Injector before @PostConstruct is invoked")
+    @timeout(10)
+    isInstanceInInjectorOnPostConstruct(done:() => void) {
+        this.injector.map(CustomModelWithPostConstruct).asSingleton();
+        let instance:CustomModelWithPostConstruct;
+        CustomModelWithPostConstruct.onPostConstruct = () => {
+            expect(
+                this.injector.get(CustomModelWithPostConstruct),
+                "Injection must be available in Injector before postConstruct is invoked"
+            ).to.be.eq(instance);
+
+            done();
+        };
+
+        instance = this.injector.get(CustomModelWithPostConstruct);
     }
 
 }

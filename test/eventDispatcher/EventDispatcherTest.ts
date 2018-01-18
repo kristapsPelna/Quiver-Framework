@@ -292,4 +292,30 @@ import {Event} from "../../src/eventDispatcher/event/Event";
         }
     }
 
+    @test("Check if Event preventDefault works")
+    preventDefaultResultsInFalseReturnedValue() {
+        let event:Event = new Event("foo");
+        expect(
+            this.eventDispatcher.dispatchEvent(event),
+            "Event with no listeners must act as it's default action is not prevented"
+        ).to.be.true;
+
+        this.eventDispatcher.addEventListener("foo", () => {});
+        expect(
+            this.eventDispatcher.dispatchEvent(event),
+            "Adding listener should not make any difference"
+        ).to.be.true;
+
+        this.eventDispatcher.addEventListener("foo", event => event.preventDefault());
+        expect(
+            this.eventDispatcher.dispatchEvent(event),
+            "dispatchEvent must return false as default action is prevented"
+        ).to.be.false;
+        expect(
+            event.defaultPrevented,
+            "defaultPrevented property of event must be true as preventDefault() is invoked"
+        ).to.be.true;
+
+    }
+
 }

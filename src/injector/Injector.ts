@@ -202,11 +202,13 @@ export class Injector extends EventDispatcher {
      * Invoking this method will also invoke any methods marked with @PostConstruct just as injected properties will
      * be filled in.
      * @param type Instance type to be created.
+     * @param postponePostConstruct Flag which is set true will postpone post construct method invocation for smallest amount of time
+     * possible in order to make mapped value available within injector as PostConstruct is called
      * @returns {any} Newly created class instance of type described by input argument.
      * @throws Error in case if method i invoked on destroyed instance
      * @throws Error in case if some Injector mapping could not be found.
      */
-    instantiateInstance(type:Type<any>):any {
+    instantiateInstance(type:Type<any>, postponePostConstruct?:boolean):any {
         this.throwErrorIfDestroyed();
 
         //There is no metadata for type - simply create instance with no constructor arguments
@@ -232,19 +234,21 @@ export class Injector extends EventDispatcher {
         let instance:any = new type(...constructorArgs);
 
         //Inject class properties if there are some and return it
-        return this.injectInto(instance);
+        return this.injectInto(instance, postponePostConstruct);
     }
 
     /**
      * Inspect given type and fill in type properties, clients for Injected values and invoke methods described with
      * @PostConstruct if there are any.
      * @param target The instance to inject into
+     * @param postponePostConstruct Flag which is set true will postpone post construct method invocation for smallest amount of time
+     * possible in order to make mapped value available within injector as PostConstruct is called
      * @returns Instance passed in via param with properties filled by injections and post construct methods invoked,
      * or as it where in case if there is no metadata tpo apply.
      * @throws Error in case if method i invoked on destroyed instance
      * @throws Error in case if some Injector mapping could not be found.
      */
-    injectInto(target:any):any {
+    injectInto(target:any, postponePostConstruct?:boolean):any {
         this.throwErrorIfDestroyed();
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
@@ -287,9 +291,16 @@ export class Injector extends EventDispatcher {
             }
         });
 
-        //Invoke post construct methods, if there are any
-        for (let method of postConstructMethods) {
-            target[method]();
+        /**
+         * Execute PostConstruct methods
+         */
+        if (!postponePostConstruct) {
+            postConstructMethods.forEach(method => target[method]());
+        } else {
+            // With slight delay if instructed so. This is required for singleton instances just we're running into problem of not having
+            // instance mapped in Injector as PotConstruct is called. Which will result in errors in case class will produce any actions that
+            // in response must acquire mapped class instance
+            setTimeout(() => postConstructMethods.forEach(method => target[method]()));
         }
 
         return target;

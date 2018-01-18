@@ -1,24 +1,34 @@
-
 /**
- * Basic event class which holds event type and data properties and which should be extended
- * by any custom event class.
+ * Basic event class which holds event type and data properties and which can be used as it is or
+ * could be extended by any custom event class.
  * @author Jānis Radiņš
  */
 export class Event {
 
-    /**
-     * Event string type
-     */
-    readonly type:string;
+    private _defaultPrevented:boolean = false;
 
     /**
-     * Data shipped along with event notification, if any
+     * Create new instance
+     * @param {string} type Event string type
+     * @param data Data shipped along with event notification, if any
      */
-    readonly data:any;
+    constructor(public readonly type:string,
+                public readonly data?:any
+    ) {}
 
-    constructor(type:string, data?:any) {
-        this.type = type;
-        this.data = data;
+    /**
+     * Flag which indicates that somewhere within event listeners default event action has been prevented
+     * @returns {boolean}
+     */
+    get defaultPrevented(): boolean {
+        return this._defaultPrevented;
+    }
+
+    /**
+     * Prevent event default action
+     */
+    preventDefault():void {
+        this._defaultPrevented = true;
     }
 
     /**

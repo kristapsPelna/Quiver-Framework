@@ -137,7 +137,7 @@ export class EventDispatcher {
     /**
      * Dispatch event object to all subscribed listeners.
      * @param event Event object that defines event type and data
-     * @returns {boolean} True if any event mappings to event name have been found; false otherwise.
+     * @returns {boolean} True if default action of event has not been prevented in any of its listeners.
      */
     dispatchEvent(event:Event):boolean;
 
@@ -145,7 +145,7 @@ export class EventDispatcher {
      * Dispatch event notification by separate type and data arguments.
      * @param eventType Event type to be dispatched.
      * @param eventData  Arbitrary data to ship along with event dispatch.
-     * @returns {boolean} True if any event mappings to event name have been found; false otherwise.
+     * @returns {boolean} True if default action of event has not been prevented in any of its listeners
      */
     dispatchEvent(eventType:string, eventData?:any):boolean;
 
@@ -153,7 +153,7 @@ export class EventDispatcher {
      * Implement event dispatch from any of method signatures
      * @param eventTypeOrEvent Event type or Event
      * @param eventData Arbitrary data to ship along with event dispatch.
-     * @returns {boolean} True if any event mappings to event name have been found; false otherwise.
+     * @returns {boolean} True if default action of event has not been prevented in any of its listeners
      * @private
      */
     dispatchEvent(eventTypeOrEvent:Event|string, eventData?:any):boolean {
@@ -230,12 +230,12 @@ export class EventDispatcher {
     /**
      * Implement actual event dispatching
      * @param event Event to dispatch
-     * @returns {boolean} True if some event clients where found and event is delivered or false otherwise.
+     * @returns {boolean} True if default action of event has not been prevented in any of its listeners
      */
     protected dispatchEventImpl(event:Event):boolean {
         let mappings:EventMappingImpl[] = this.getEventMappings(event.type);
         if (mappings.length === 0) {
-            return false;
+            return true;
         }
 
         while (mappings.length > 0) {
@@ -249,7 +249,7 @@ export class EventDispatcher {
             }
         }
 
-        return true;
+        return !event.defaultPrevented;
     }
 
     //--------------------
