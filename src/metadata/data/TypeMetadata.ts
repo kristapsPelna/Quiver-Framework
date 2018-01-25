@@ -38,7 +38,7 @@ export class TypeMetadata {
 
     /**
      * Create new instance
-     * @param type Type of class prototype this instance holds metadata for
+     * @param typeMeta Type of class prototype this instance holds metadata for
      */
     constructor(typeMeta:TypeMetadataInternal) {
         //Parse raw constructor arguments data into more usable format
@@ -48,8 +48,8 @@ export class TypeMetadata {
                 constructorArguments.push({
                     index: i,
                     type: typeMeta.constructorArguments[i],
-                    isOptional: typeMeta.optionalConstructorArguments.indexOf(i) != -1
-                })
+                    isOptional: typeMeta.optionalConstructorArguments.indexOf(i) !== -1
+                });
             }
         }
         this.constructorArguments = constructorArguments;
@@ -60,8 +60,8 @@ export class TypeMetadata {
                 propertyInjections.push({
                     name: name,
                     type: type,
-                    isOptional: typeMeta.optionalPropertyInjections.indexOf(name) != -1
-                })
+                    isOptional: typeMeta.optionalPropertyInjections.indexOf(name) !== -1
+                });
             });
         }
         this.propertyInjections = propertyInjections;

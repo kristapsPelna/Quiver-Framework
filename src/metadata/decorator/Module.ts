@@ -15,5 +15,5 @@ export function Module(descriptor:ModuleDescriptor):Function {
         Injectable()(target);
         metadataInternal.getTypeDescriptor(target).setModuleDescriptor(descriptor);
         return target;
-    }
+    };
 }

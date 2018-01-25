@@ -1,3 +1,5 @@
+import "reflect-metadata";
+import {ContextTest} from "./context/ContextTest";
 import {InjectorTest} from "./injector/InjectorTest";
 import {MetadataTest} from "./metadata/MetadataTest";
 import {EventDispatcherTest} from "./eventDispatcher/EventDispatcherTest";
@@ -15,6 +17,7 @@ class CoreTests {
      * The order of their execution is defined by their import order.
      */
     testSuites = [
+        ContextTest,
         InjectorTest,
         MetadataTest,
         EventDispatcherTest,

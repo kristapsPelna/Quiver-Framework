@@ -1,0 +1,49 @@
+{
+  "rules": {
+    "adjacent-overload-signatures": true,
+    "align": [true, "parameters", "statements"],
+    "class-name": true,
+    "curly": true,
+    "one-line": [true,
+      "check-open-brace",
+      "check-catch",
+      "check-else",
+      "check-finally",
+      "check-whitespace"
+    ],
+    "whitespace": [true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator"
+    ],
+    "indent": [
+      true,
+      "spaces"
+    ],
+    "triple-equals": [true,
+      "allow-null-check",
+      "allow-undefined-check"
+    ],
+    "no-eval": true,
+    "no-conditional-assignment": true,
+    "no-construct": true,
+    "no-console": [true, "debug"],
+    "no-debugger": true,
+    "no-duplicate-super": true,
+    "no-duplicate-variable": true,
+    "no-invalid-this": true,
+    "no-string-throw": true,
+    "no-var-keyword": true,
+    "no-unused-expression": false,
+    "no-consecutive-blank-lines": true,
+    "max-classes-per-file": [true, 1],
+    "cyclomatic-complexity": true,
+    "prefer-for-of": true,
+    "one-variable-per-declaration": [true, "ignore-for-loop"],
+    "only-arrow-functions": [true, "allow-declarations"],
+    "max-line-length": [true, 180],
+    "trailing-comma": true,
+    "semicolon": [true, "always", "ignore-interfaces"]
+  }
+}

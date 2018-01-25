@@ -39,13 +39,13 @@ import {InjectionDescriptor} from "../../src/metadata/data/InjectionDescriptor";
 
         expect(
             typeMetadata.constructorArguments[0].type,
-            "First constructor argument type must be CustomInjectedClass"
-        ).to.be.eq(CustomInjectedClass);
+            "Second constructor argument type must be Injector"
+        ).to.be.eq(Injector);
 
         expect(
             typeMetadata.constructorArguments[1].type,
-            "Second constructor argument type must be Injector"
-        ).to.be.eq(Injector);
+            "First constructor argument type must be CustomInjectedClass"
+        ).to.be.eq(CustomInjectedClass);
 
         expect(
             typeMetadata.constructorArguments[0].isOptional,
@@ -71,6 +71,15 @@ import {InjectionDescriptor} from "../../src/metadata/data/InjectionDescriptor";
             typeMetadata.mappedInterfaces[0],
             "First mapped interface must be CustomInterface"
         ).to.be.eq(CustomInterface);
+    }
+
+    @test("Get non existent type descriptor")
+    getNonExistentTypeDescriptor() {
+
+        expect(
+            () => metadata.getTypeDescriptor(CustomInterface),
+            "Getting Type Descriptor of a class without descriptors should cause an error"
+        ).to.throw(Error);
     }
 
     @test("Get module descriptor")
@@ -173,7 +182,7 @@ import {InjectionDescriptor} from "../../src/metadata/data/InjectionDescriptor";
     }
 
     @test("@Module metadata Requires")
-    moduleRequires(done: Function) {
+    moduleRequires(done:() => void) {
         RequiredModule.constructionCallback = done;
 
         let context:Context = new Context();

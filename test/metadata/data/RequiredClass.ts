@@ -4,7 +4,7 @@
  */
 export class RequiredClass {
 
-    static constructionCallback:Function;
+    static constructionCallback:() => void;
 
     constructor() {
         if (RequiredClass.constructionCallback) {

@@ -8,7 +8,7 @@ export class CustomCommand extends Command {
     /**
      * Async test callback function
      */
-    static done:Function;
+    static done:() => void;
 
     constructor() {
         super();

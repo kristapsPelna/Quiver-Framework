@@ -5,6 +5,7 @@ import {CustomAsyncCommand} from "./CustomAsyncCommand";
 import {AsyncCommand} from "../../../src/commandMap/command/AsyncCommand";
 import {Type} from "../../../src/type/Type";
 import {Command} from "../../../src/commandMap/command/Command";
+import {EventGuard} from "../../../src/eventDispatcher/api/EventGuard";
 /**
  * Custom Macro command used for tests
  * @author Kristaps Peļņa
@@ -14,19 +15,27 @@ export class CustomMacroCommand extends MacroCommand {
     /**
      * Async test callback function
      */
-    static done:Function;
+    static done:() => void;
 
     private commandOrder:Type<Command|AsyncCommand>[] = [
         CustomAsyncCommand,
         CustomCommand,
+        CustomCommand2,
         CustomCommand2
+    ];
+
+    private guards:EventGuard[][] = [
+        null,
+        null,
+        [() => true],
+        [() => false]
     ];
 
     constructor() {
         super();
 
-        for (let command of this.commandOrder) {
-            this.add(command);
+        for (let i:number = 0; i < this.commandOrder.length; i++) {
+            this.add(this.commandOrder[i], this.guards[i]);
         }
     }
 

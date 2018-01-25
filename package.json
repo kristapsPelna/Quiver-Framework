@@ -1,20 +1,25 @@
 {
   "name": "quiver-framework",
-  "version": "0.4.5",
+  "description": "Lightweight micro framework for TypeScript/JavaScript",
+  "version": "0.6.0",
   "scripts": {
     "start": "serve",
-    "export": "rimraf dist && tsc && copy readme.md dist",
+    "export": "rimraf dist && tsc && copy README.md dist",
     "build": "npm run build:patch",
-    "build:patch": "npm run test && npm run export && npm version patch && copy package.json dist && npm publish dist",
-    "build:minor": "npm run test && npm run export && npm version minor && copy package.json dist && npm publish dist",
-    "build:major": "npm run test && npm run export && npm version major && copy package.json dist && npm publish dist",
-    "test": "tsc -p tsconfig-test.json && npm run mochaWithLibraries && npm run clean",
+    "build:patch": "npm run localTest && npm run export && npm version patch && copy package.json dist && npm publish dist",
+    "build:minor": "npm run localTest && npm run export && npm version minor && copy package.json dist && npm publish dist",
+    "build:major": "npm run localTest && npm run export && npm version major && copy package.json dist && npm publish dist",
+    "transpileTest": "tsc -p test/tsconfig.json",
+    "test": "npm run transpileTest && nyc mocha && nyc report --reporter=json",
+    "posttest": "codecov -f coverage/*.json",
+    "localTest": "npm run transpileTest && nyc mocha && npm run clean",
+    "lint": "tslint -t stylish src/**/*.ts test/**/*.ts",
+    "lintFix": "tslint -t stylish --fix src/**/*.ts test/**/*.ts",
     "docs": "typedoc --out docs src --mode file --excludePrivate --hideGenerator --name Quiver-Framework",
-    "mochaWithLibraries": "mocha --require reflect-metadata",
-    "testOnFileChange": "mocha-typescript-watch",
     "clean": "rimraf src/**/*.d.ts src/**/*.js src/**/*js.map test/**/*.d.ts test/**/*.js test/**/*js.map index.d.ts index.js index.js.map"
   },
   "main": "index.js",
+  "license": "MIT",
   "contributors": [
     {
       "name": "Jānis Radiņš",
@@ -31,20 +36,29 @@
     "dependency-injection",
     "ioc"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kristapsPelna/Quiver-Framework"
+  },
   "dependencies": {
-    "reflect-metadata": "^0.1.9"
+    "reflect-metadata": "^0.1.12"
   },
   "devDependencies": {
-    "@types/chai": "^3.5.1",
-    "@types/mocha": "^2.2.41",
-    "chai": "^3.5.0",
-    "copy": "^0.3.0",
-    "mocha": "^3.2.0",
-    "mocha-typescript": "^1.0.23",
-    "rimraf": "^2.6.1",
-    "serve": "^5.1.4",
-    "systemjs": "^0.20.12",
-    "typedoc": "^0.5.10",
-    "typescript": "^2.3.0"
+    "@types/chai": "3.5.2",
+    "@types/mocha": "2.2.41",
+    "chai": "3.5.0",
+    "codecov": "2.2.0",
+    "copy": "0.3.0",
+    "mocha": "3.3.0",
+    "mocha-lcov-reporter": "1.3.0",
+    "mocha-typescript": "1.0.23",
+    "nyc": "10.3.2",
+    "rimraf": "2.6.1",
+    "serve": "5.1.5",
+    "systemjs": "0.20.12",
+    "tslint": "^5.2.0",
+    "typedoc": "0.6.0",
+    "typescript": "2.3.0",
+    "yarn": "^0.24.4"
   }
 }

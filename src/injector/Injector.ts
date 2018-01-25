@@ -13,7 +13,7 @@ import {PropertyInjection} from "../metadata/data/PropertyInjection";
  */
 export class Injector extends EventDispatcher {
 
-    private readonly MASTER_SEAL_KEY:Object = (Math.random() * 0xFFFFFFFF).toString(16);
+    private readonly MASTER_SEAL_KEY:String = (Math.random() * 0xFFFFFFFF).toString(16);
 
     private _destroyed:boolean = false;
 
@@ -53,6 +53,7 @@ export class Injector extends EventDispatcher {
      * @returns {Injector}
      */
     createSubInjector():Injector {
+        this.throwErrorIfDestroyed();
         return new Injector(this);
     }
 
@@ -64,9 +65,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if attempt to override sealed mapping is encountered
      */
     map(type:Type<any>):InjectionMapping {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (this.hasDirectMapping(type)) {
             let existingMapping:InjectionMapping = this.getMapping(type);
@@ -95,21 +94,22 @@ export class Injector extends EventDispatcher {
      * @throws Error if sealed mapping is attempted to be unmapped
      */
     unMap(type:Type<any>):void {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (!this.hasDirectMapping(type)) {
-            throw new Error(`Injector error: no mapping could be located for ${typeReferenceToString(type)} as unmap is attempted!`);
+            throw new Error(`Injector error: no mapping could be located for ${typeReferenceToString(type)} as unMap is attempted!`);
         }
 
         let mapping:InjectionMapping = this.getMapping(type);
         if (mapping.sealed) {
-            throw new Error(`Injector error: cannot unmap sealed mapping of type: ${typeReferenceToString(type)}!`);
+            throw new Error(`Injector error: cannot unMap sealed mapping of type: ${typeReferenceToString(type)}!`);
         }
 
         //Destroy mapping
-        mapping.destroy();
+        if (!mapping.destroyed) {
+            mapping.destroy();
+        }
+
         this.mappings.delete(type);
         this.dispatchEvent(new MappingEvent(MappingEvent.MAPPING_DESTROYED, type, mapping));
     }
@@ -121,9 +121,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if method i invoked on destroyed instance
      */
     hasDirectMapping(type:Type<any>):boolean {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         return this.mappings.has(type);
     }
@@ -135,9 +133,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if method i invoked on destroyed instance
      */
     hasMapping(type:Type<any>):boolean {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         let injector:Injector = this;
         do {
@@ -164,9 +160,7 @@ export class Injector extends EventDispatcher {
      * @throws Error when no mapping was found for the specified dependency
      */
     getMapping(type:Type<any>):InjectionMapping {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (!this.hasDirectMapping(type)) {
             throw new Error(`Injector error: no mapping could be located for ${typeReferenceToString(type)}`);
@@ -182,9 +176,7 @@ export class Injector extends EventDispatcher {
      * @throws Error when no mapping was found for the specified dependency
      */
     get(type:Type<any>):any {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+        this.throwErrorIfDestroyed();
 
         if (!this.hasMapping(type)) {
             throw new Error(`There are no known mapping for ${typeReferenceToString(type)} type in Injector!`);
@@ -210,14 +202,14 @@ export class Injector extends EventDispatcher {
      * Invoking this method will also invoke any methods marked with @PostConstruct just as injected properties will
      * be filled in.
      * @param type Instance type to be created.
+     * @param postponePostConstruct Flag which is set true will postpone post construct method invocation for smallest amount of time
+     * possible in order to make mapped value available within injector as PostConstruct is called
      * @returns {any} Newly created class instance of type described by input argument.
      * @throws Error in case if method i invoked on destroyed instance
      * @throws Error in case if some Injector mapping could not be found.
      */
-    instantiateInstance(type:Type<any>):any {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+    instantiateInstance(type:Type<any>, postponePostConstruct?:boolean):any {
+        this.throwErrorIfDestroyed();
 
         //There is no metadata for type - simply create instance with no constructor arguments
         if (!metadata.hasMetadata(type)) {
@@ -230,8 +222,7 @@ export class Injector extends EventDispatcher {
 
         //Collect array of constructor arguments, if there are any
         const constructorArgs:any[] = [];
-        for (let i:number = 0; i < typeMeta.constructorArguments.length; i++) {
-            let argData:ConstructorArg = typeMeta.constructorArguments[i];
+        for (let argData of typeMeta.constructorArguments) {
             let mappingIsPresent:boolean = this.hasMapping(argData.type);
             if (!mappingIsPresent && !argData.isOptional) {
                 throw new Error(`Constructor argument of type: ${typeReferenceToString(argData.type)} for ${typeReferenceToString(type)} could not be found in Injector!`);
@@ -243,22 +234,22 @@ export class Injector extends EventDispatcher {
         let instance:any = new type(...constructorArgs);
 
         //Inject class properties if there are some and return it
-        return this.injectInto(instance);
+        return this.injectInto(instance, postponePostConstruct);
     }
 
     /**
      * Inspect given type and fill in type properties, clients for Injected values and invoke methods described with
      * @PostConstruct if there are any.
      * @param target The instance to inject into
+     * @param postponePostConstruct Flag which is set true will postpone post construct method invocation for smallest amount of time
+     * possible in order to make mapped value available within injector as PostConstruct is called
      * @returns Instance passed in via param with properties filled by injections and post construct methods invoked,
      * or as it where in case if there is no metadata tpo apply.
      * @throws Error in case if method i invoked on destroyed instance
      * @throws Error in case if some Injector mapping could not be found.
      */
-    injectInto(target:any):any {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+    injectInto(target:any, postponePostConstruct?:boolean):any {
+        this.throwErrorIfDestroyed();
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
         //There are no metadata for given type - do nothing
@@ -271,7 +262,7 @@ export class Injector extends EventDispatcher {
 
         //Join definitions of property injections and post construct methods from all inherited meta
         for (let meta of inheritedMetadata) {
-            for(let injection of meta.propertyInjections) {
+            for (let injection of meta.propertyInjections) {
                 if (!propertyInjections.has(injection.name)) {
                     propertyInjections.set(injection.name, injection);
                     //If there are several definitions where one is optional and other not - use it as optional
@@ -280,7 +271,7 @@ export class Injector extends EventDispatcher {
                 }
             }
 
-            for(let method of meta.postConstructMethods) {
+            for (let method of meta.postConstructMethods) {
                 if (postConstructMethods.indexOf(method) === -1) {
                     postConstructMethods.push(method);
                 }
@@ -291,20 +282,28 @@ export class Injector extends EventDispatcher {
         propertyInjections.forEach((injection:PropertyInjection) => {
             let mappingIsPresent:boolean = this.hasMapping(injection.type);
             if (!mappingIsPresent && !injection.isOptional) {
-                throw new Error(`Injected property of type: ${typeReferenceToString(injection.type)} for ${typeReferenceToString(target.constructor)} could not be found in Injector!`);
+                const typeString:String = typeReferenceToString(injection.type);
+                const classString:String = typeReferenceToString(target.constructor);
+                throw new Error(`Injected property of type: ${typeString} for ${classString} could not be found in Injector!`);
             }
             if (mappingIsPresent) {
                 target[injection.name] = this.get(injection.type);
             }
         });
 
-        //Invoke post construct methods, if there are any
-        for (let method of postConstructMethods) {
-            target[method]();
+        /**
+         * Execute PostConstruct methods
+         */
+        if (!postponePostConstruct) {
+            postConstructMethods.forEach(method => target[method]());
+        } else {
+            // With slight delay if instructed so. This is required for singleton instances just we're running into problem of not having
+            // instance mapped in Injector as PotConstruct is called. Which will result in errors in case class will produce any actions that
+            // in response must acquire mapped class instance
+            setTimeout(() => postConstructMethods.forEach(method => target[method]()));
         }
 
         return target;
-
     }
 
     /**
@@ -312,10 +311,8 @@ export class Injector extends EventDispatcher {
      * @param target instance of injected values client
      * @throws Error in case if method is invoked on destroyed instance
      */
-    destroyInstance(target:any):void {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+    destroyInstance(target:any):void|Error {
+        this.throwErrorIfDestroyed();
 
         const inheritedMetadata:TypeMetadata[] = metadata.getInheritedMetadata(target);
         //There are no metadata for given type - do nothing
@@ -327,7 +324,7 @@ export class Injector extends EventDispatcher {
 
         //Join definitions of pre destroy methods from all inherited meta
         for (let meta of inheritedMetadata) {
-            for(let method of meta.preDestroyMethods) {
+            for (let method of meta.preDestroyMethods) {
                 if (preDestroyMethods.indexOf(method) === -1) {
                     preDestroyMethods.push(method);
                 }
@@ -344,10 +341,8 @@ export class Injector extends EventDispatcher {
      * Destroy injector and all of its direct mappings.
      * @throws Error in case if Injector is already destroyed
      */
-    destroy():void {
-        if (this._destroyed) {
-            throw new Error("Injector instance is already destroyed!");
-        }
+    destroy():void|Error {
+        this.throwErrorIfDestroyed();
 
         //Remove all mappings
         this.mappings.forEach((mapping:InjectionMapping, type:Type<any>) => {
@@ -358,5 +353,14 @@ export class Injector extends EventDispatcher {
         });
 
         this._destroyed = true;
+    }
+
+    /**
+     * Throw error if Injector is already destroyed.
+     */
+    private throwErrorIfDestroyed():void {
+        if (this._destroyed) {
+            throw new Error("Injector instance is already destroyed!");
+        }
     }
 }

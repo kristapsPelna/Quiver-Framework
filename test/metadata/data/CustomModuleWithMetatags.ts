@@ -10,6 +10,7 @@ import {Injector} from "../../../src/injector/Injector";
 import {PostConstruct} from "../../../src/metadata/decorator/PostConstruct";
 import {PreDestroy} from "../../../src/metadata/decorator/PreDestroy";
 import {CustomInjectedClass} from "./CustomInjectedClass";
+import {CustomCommand} from "../../commandMap/data/CustomCommand";
 /**
  * Custom module class for tests
  * @author Kristaps Peļņa
@@ -29,8 +30,18 @@ import {CustomInjectedClass} from "./CustomInjectedClass";
             map: CustomModel2,
             useExisting: CustomModel
         }
+    ],
+    commandMap:[
+        {
+            event: "Test",
+            command: CustomCommand,
+            once: true
+        }
     ]
 })
+//Test an empty MapInterface
+@MapInterface()
+//Test a full MapInterface
 @MapInterface(CustomInterface)
 export class CustomModuleWithMetatags implements CustomInterface {
 
@@ -41,7 +52,12 @@ export class CustomModuleWithMetatags implements CustomInterface {
     @Inject()
     private injector:Injector;
 
-    constructor(customClass:CustomInjectedClass, injector:Injector) {
+    @Optional()
+    get intentionallyIncorrectOptionalMetatagUse():null {
+        return null;
+    }
+
+    constructor(injector:Injector, @Optional() customClass:CustomInjectedClass) {
 
     }
 

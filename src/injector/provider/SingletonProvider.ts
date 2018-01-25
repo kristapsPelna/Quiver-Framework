@@ -11,12 +11,11 @@ export class SingletonProvider implements InjectionValueProvider {
 
     constructor(private injector:Injector,
                 private type:Type<any>) {
-
     }
 
     getProviderValue():any {
         if (!this.instance) {
-            this.instance = this.injector.instantiateInstance(this.type);
+            this.instance = this.injector.instantiateInstance(this.type, true);
         }
         return this.instance;
     }
@@ -27,4 +26,5 @@ export class SingletonProvider implements InjectionValueProvider {
             this.instance = null;
         }
     }
+
 }

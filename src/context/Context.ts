@@ -14,7 +14,7 @@ import {InjectionDescriptor} from "../metadata/data/InjectionDescriptor";
 /**
  * Application context representation class - a hosting environment for application or its sub context
  * TODO: Add handling of child and parent contexts in this class
- * @author Jānis Radiņš
+ * @author Jānis Radiņš / Kristaps Peļņa
  */
 export class Context extends EventDispatcher {
 
@@ -49,7 +49,7 @@ export class Context extends EventDispatcher {
      * Extension mappings and modules should be added only whilst Context is not initialized.
      * @returns {boolean}
      */
-    get initialized(): boolean {
+    get initialized():boolean {
         return this._initialized;
     }
 
@@ -57,7 +57,7 @@ export class Context extends EventDispatcher {
      * Whether context is destroyed and thus unusable
      * @return {boolean}
      */
-    get destroyed(): boolean {
+    get destroyed():boolean {
         return this._destroyed;
     }
 
@@ -66,19 +66,49 @@ export class Context extends EventDispatcher {
     //--------------------------
 
     /**
-     * Install Context extensions or
+     * Install Context extensions
      * @param extension A single entry or list of Type<ContextExtension> entries
      * @returns {Context} Current context operation is performed on
      */
-    install(... extension):this {
-        if(this._initialized) {
-            throw new Error("Installation of extensions are no permitted as context is already initialized");
+    install(...extension):this {
+        if (this._initialized) {
+            throw new Error("Installation of extensions is not permitted as context is already initialized");
         }
-        //Flatten lists if there are any
+        this.throwErrorIfDestroyed();
+
         for (let ext of extension) {
-            this.extensions.push(... ext);
+            this.extensions.push(ext);
         }
         return this;
+    }
+
+    /**
+     * Uninstall Context extensions
+     * @param extension A single entry or list of Type<ContextExtension> entries
+     * @returns {Context} Current context operation is performed on
+     */
+    uninstall(...extension):this {
+        if (this._initialized) {
+            throw new Error("Extensions can not be uninstall after a context initialization");
+        }
+        this.throwErrorIfDestroyed();
+
+        for (let ext of extension) {
+            const index:number = this.extensions.indexOf(ext);
+            if (index !== -1) {
+                this.extensions.splice(index, 1);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Check if an extension is installed
+     * @param extension A context extension
+     * @returns {boolean}
+     */
+    hasExtension(extension:Type<ContextExtension>):boolean {
+        return this.extensions.indexOf(extension) !== -1;
     }
 
     /**
@@ -87,9 +117,10 @@ export class Context extends EventDispatcher {
      * @returns {Context} Current context operation is performed on
      */
     configure(... module):this {
-        if(this._initialized) {
-            throw new Error("Installation of extensions are no permitted as context is already initialized");
+        if (this._initialized) {
+            throw new Error("Configuration of modules is not permitted as context is already initialized");
         }
+        this.throwErrorIfDestroyed();
 
         this.modules.push(... module);
         return this;
@@ -99,10 +130,11 @@ export class Context extends EventDispatcher {
      * Initialize context - install extensions, map modules and move through init lifecycle phases
      * @throws Error on repeated call
      */
-    initialize():void {
-        if(this._initialized) {
-            throw new Error("Installation is already a done deed");
+    initialize():void|Error {
+        if (this._initialized) {
+            throw new Error("Context is already installed");
         }
+        this.throwErrorIfDestroyed();
 
         //Create extension instances before we proceed
         this.initializeExtensions();
@@ -136,15 +168,18 @@ export class Context extends EventDispatcher {
 
     /**
      * Destroy context, its Injector, modules and extensions
+     * @throws Error if context is not initialized or already destroyed
      */
-    destroy():void {
-        if(!this._initialized || this._destroyed) {
-            throw new Error("Context is not yet initialized or already destroyed - wrong place and/or wrong time, pal!");
+    destroy():void|Error {
+        if (!this._initialized) {
+            throw new Error("Context is not initialized yet");
         }
+        this.throwErrorIfDestroyed();
 
         //Inform on pre-initialize, so extensions have a event pointer to do basic destroy
         this.dispatchEvent(new ContextLifecycleEvent(ContextLifecycleEvent.PRE_DESTROY, this));
         //Implement actual tear down as this is encountered
+
         this.dispatchEvent(new ContextLifecycleEvent(ContextLifecycleEvent.DESTROY, this));
 
         //this will invoke preDestroy on all singleton instances spawned via Injector
@@ -157,11 +192,18 @@ export class Context extends EventDispatcher {
 
         //finalize stuff
         this.dispatchEvent(new ContextLifecycleEvent(ContextLifecycleEvent.POST_DESTROY, this));
+        this.removeAllEventListeners();
     }
 
     //--------------------------
     //  Private methods
     //--------------------------
+
+    private throwErrorIfDestroyed():void {
+        if (this._destroyed) {
+            throw new Error("Context is already destroyed");
+        }
+    }
 
     private initializeExtensions():void {
         for (let extensionType of this.extensions) {
@@ -180,7 +222,10 @@ export class Context extends EventDispatcher {
     private registerModule(module:Type<any>, parent?:Type<any>):void {
         if (this.moduleMetadata.has(module)) {
             if (!parent) {
-                console.warn(`Context warn: ${typeReferenceToString(module)} is mapped sever times to Context. Not a big problem as second mapping will be ignored but this indicates that there could be some error.`)
+                console.warn(`
+                    Context warn: ${typeReferenceToString(module)} is mapped sever times to Context.
+                    Not a big problem as second mapping will be ignored but this indicates that there could be some error.
+                `);
             }
             return;
         }
@@ -204,58 +249,70 @@ export class Context extends EventDispatcher {
         }
         this.moduleMetadata.set(module, meta.moduleDescriptor);
         //Dispatch event so Context extensions can react to new module added to Context scope
-        this.dispatchEvent(new ContextModuleEvent(ContextModuleEvent.REGISTER_MODULE, this, meta.moduleDescriptor));
-
+        this.dispatchEvent(new ContextModuleEvent(
+            ContextModuleEvent.REGISTER_MODULE,
+            this,
+            module,
+            meta.moduleDescriptor
+        ));
     }
 
     private prepareInjector():void {
         let injectionsToInstantiate:Type<any>[] = [];
         this.moduleMetadata.forEach((moduleDescriptor:ModuleDescriptor) => {
-            if (moduleDescriptor.mappings) {
+            if (!moduleDescriptor.mappings) {
+                return;
+            }
 
-                for (let mapping of moduleDescriptor.mappings) {
-                    //We have got a singular entry and such are to be mapped as singletons
-                    if ("map" in mapping === false) {
-                        const mappedType:Type<any> = mapping as Type<any>;
-                        if (this.injector.hasDirectMapping(mappedType)) {
-                            this.injector.unMap(mappedType);
-                        }
-                        this.injector.map(<Type<any>> mapping).asSingleton();
-                    } else {
-                        const injection:InjectionDescriptor = mapping as InjectionDescriptor;
-                        if (typeof injection.map !== "function") {
-                            throw new Error("Injection mapping doesn't seem to be a valid object type");
-                        }
-
-                        let injectionMapping:InjectionMapping = this.injector.map(injection.map);
-                        if (injection.useExisting) {
-                            //if use existing is set create forward reference and ignore the rest
-                            injectionMapping.toExisting(injection.useExisting);
-                        } else if (injection.useValue) {
-                            //Look for use value as next one
-                            injectionMapping.toValue(injection.useValue);
-                        } else if (injection.useType) {
-                            //If use type is set map injection to type or to singleton in case if asSingleton is present
-                            if ('asSingleton' in injection && !injection.asSingleton) {
-                                injectionMapping.toType(injection.useType);
-                            } else {
-                                injectionMapping.toSingleton(injection.useType);
-                            }
-                        } else if (injectionMapping.asSingleton) {
-                            //If everything else fails make mapping as singleton
-                            injectionMapping.asSingleton();
-                        }
-                        if (injection.instantiate && injectionsToInstantiate.indexOf(injection.map) === -1) {
-                            injectionsToInstantiate.push(injection.map);
-                        }
-                    }
-                }
+            for (let mapping of moduleDescriptor.mappings) {
+                injectionsToInstantiate.push(...this.prepareMapping(mapping));
             }
         });
         //Instantiate mappings that have been marked so
         for (let instanceToInstantiate of injectionsToInstantiate) {
             this.injector.get(instanceToInstantiate);
         }
+    }
+
+    private prepareMapping(mapping:Type<any>|InjectionDescriptor):Type<any>[] {
+        let injectionsToInstantiate:Type<any>[] = [];
+
+        //We have got a singular entry and such are to be mapped as singletons
+        if ("map" in mapping === false) {
+            const mappedType:Type<any> = mapping as Type<any>;
+            if (this.injector.hasDirectMapping(mappedType)) {
+                this.injector.unMap(mappedType);
+            }
+            this.injector.map(<Type<any>> mapping).asSingleton();
+        } else {
+            const injection:InjectionDescriptor = mapping as InjectionDescriptor;
+            if (typeof injection.map !== "function") {
+                throw new Error("Injection mapping doesn't seem to be a valid object type");
+            }
+
+            let injectionMapping:InjectionMapping = this.injector.map(injection.map);
+            if (injection.useExisting) {
+                //if use existing is set create forward reference and ignore the rest
+                injectionMapping.toExisting(injection.useExisting);
+            } else if (injection.useValue) {
+                //Look for use value as next one
+                injectionMapping.toValue(injection.useValue);
+            } else if (injection.useType) {
+                //If use type is set map injection to type or to singleton in case if asSingleton is present
+                if ('asSingleton' in injection && !injection.asSingleton) {
+                    injectionMapping.toType(injection.useType);
+                } else {
+                    injectionMapping.toSingleton(injection.useType);
+                }
+            } else if (injectionMapping.asSingleton) {
+                //If everything else fails make mapping as singleton
+                injectionMapping.asSingleton();
+            }
+            if (injection.instantiate && injectionsToInstantiate.indexOf(injection.map) === -1) {
+                injectionsToInstantiate.push(injection.map);
+            }
+        }
+        return injectionsToInstantiate;
     }
 
     private initializeModules():void {

@@ -5,6 +5,7 @@ import {ClassProvider} from "../provider/ClassProvider";
 import {SingletonProvider} from "../provider/SingletonProvider";
 import {ValueProvider} from "../provider/ValueProvider";
 import {ExistingMappingProvider} from "../provider/ExistingMappingProvider";
+import {typeReferenceToString} from "../../util/StringUtil";
 /**
  * Injector data mapping instance.
  * @author Jānis Radiņš
@@ -22,12 +23,11 @@ export class InjectionMapping {
      * Create new instance of injector mapping
      * @param type Mapping type of injected value by which it will be requested from injector
      * @param injector Hosting Injector instance of current mapping
+     * @param masterSealKey Master seal key is necessary for unsealed by injector during destroy
      */
-    constructor(
-        public readonly type:Type<any>,
-        public readonly injector:Injector,
-        private readonly masterSealKey:Object
-    ) {
+    constructor(public readonly type:Type<any>,
+                public readonly injector:Injector,
+                private readonly masterSealKey:Object) {
         this.defaultProviderSet = true;
         //Set class provider as a default value provider
         this.setProvider(new ClassProvider(injector, type));
@@ -41,7 +41,7 @@ export class InjectionMapping {
      * Whether injection is sealed
      * @returns {boolean}
      */
-    get sealed(): boolean {
+    get sealed():boolean {
         return this._sealed;
     }
 
@@ -49,7 +49,7 @@ export class InjectionMapping {
      * Whether injection is destroyed
      * @returns {boolean}
      */
-    get destroyed(): boolean {
+    get destroyed():boolean {
         return this._destroyed;
     }
 
@@ -126,7 +126,7 @@ export class InjectionMapping {
      * @returns {InjectionMapping} The InjectionMapping the method is invoked on
      */
     unseal(key:Object):this {
-        if (!this._sealed){
+        if (!this._sealed) {
             throw new Error(`Can't unseal a non-sealed mapping.`);
         }
         if (key !== this.sealKey && key !== this.masterSealKey) {
@@ -152,7 +152,7 @@ export class InjectionMapping {
     /**
      * Destroy injection provider and invoke clearCommandMap of values provided if current value type supports that.
      */
-    destroy():void {
+    destroy():void|Error {
         if (this._destroyed) {
             throw new Error(`InjectionMapping for type: ${this.type} is already destroyed!`);
         }
@@ -168,7 +168,7 @@ export class InjectionMapping {
     //  Private methods
     //------------------------------
 
-    private setProvider(provider:InjectionValueProvider):void {
+    private setProvider(provider:InjectionValueProvider):void|Error {
         if (this._destroyed) {
             throw new Error(`Can't change a destroyed mapping`);
         }
@@ -178,11 +178,12 @@ export class InjectionMapping {
         }
 
         if (!this.defaultProviderSet && this.provider) {
-            console.debug("defaultProviderSet", this.defaultProviderSet)
-            console.debug("provider", this.provider)
-            console && console.warn(`Injector already has mapping for ${this.type} and its being overridden. ` +
-                                    `This could be or could not be error. Anyhow it's suggested to use injector.unmap()` +
-                                    ` before new mapping is set.`);
+            console.log("provider", this.provider);
+            console.warn(
+                `Injector already has mapping for ${typeReferenceToString(this.type)} and its being overridden. ` +
+                `This could be or could not be error, buy it's suggested to use injector.unMap() ` +
+                `before new mapping is set.`
+            );
         }
 
         //Check if current provider is default one

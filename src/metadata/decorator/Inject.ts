@@ -14,5 +14,5 @@ export function Inject():Function {
 
         metadataInternal.getTypeDescriptor(<Type<any>> target.constructor).addPropertyInjection(variable, variableType);
         return target;
-    }
+    };
 }

@@ -6,6 +6,9 @@ import {CustomCommand2} from "./data/CustomCommand2";
 import {EventGuard} from "../../src/eventDispatcher/api/EventGuard";
 import {CustomMacroCommand} from "./data/CustomMacroCommand";
 import {Injector} from "../../src/injector/Injector";
+import {Event} from "../../src/eventDispatcher/event/Event";
+import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingImpl";
+import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
 /**
  * CommandMap test suite
@@ -43,13 +46,37 @@ import {Injector} from "../../src/injector/Injector";
         ).to.be.eq(0);
     }
 
+    @test("Trigger event with eventName")
+    triggerEventWithEventName() {
+        const eventName:string = "test";
+        expect(
+            this.commandMap.trigger(eventName),
+            "Command trigger with eventName should not throw an error"
+        ).to.be.undefined;
+    }
+
+    @test("Trigger event with event instance")
+    triggerEventWithEventInstance() {
+        const event:Event = new Event("test");
+
+        expect(
+            this.commandMap.trigger(event),
+            "Command trigger with event instance should not throw an error"
+        ).to.be.undefined;
+    }
+
     @test("Map command")
     @timeout(500) //Limit waiting time in case the callback is not called
-    mapCommand(done:Function) {
+    mapCommand(done:() => void) {
         const eventName:string = "test";
         CustomCommand.done = done;
 
-        this.commandMap.map(eventName, CustomCommand);
+        const mapping:CommandMappingImpl = this.commandMap.map(eventName, CustomCommand) as CommandMappingImpl;
+
+        expect(
+            mapping.eventClass,
+            "Mapping event class should be Event by default"
+        ).to.be.eq(Event);
 
         expect(
             this.commandMap.mappingCount,
@@ -84,9 +111,45 @@ import {Injector} from "../../src/injector/Injector";
         this.commandMap.trigger(eventName);
     }
 
+    @test("Map command twice")
+    mapCommandTwice() {
+        const eventName:string = "test";
+
+        expect(
+            this.commandMap.map(eventName, CustomCommand),
+            "First command map should return the mapping"
+        ).to.be.not.null;
+
+        expect(
+            this.commandMap.map(eventName, CustomCommand),
+            "Second command map should return null, because the mapping already exists"
+        ).to.be.null;
+    }
+
+    @test("Map command to two events")
+    mapCommandToTwoEvents() {
+        const eventName:string = "test";
+        const eventName2:string = "test2";
+
+        let executeCount:number = 0;
+
+        CustomCommand.done = () => executeCount++;
+
+        this.commandMap.map(eventName, CustomCommand);
+        this.commandMap.map(eventName2, CustomCommand);
+
+        this.commandMap.trigger(eventName2);
+        this.commandMap.trigger(eventName);
+
+        expect(
+            executeCount,
+            "Command should be executed twice"
+        ).to.be.eq(2);
+    }
+
     @test("Map command with successful guard")
     @timeout(500) //Limit waiting time in case the callback is not called
-    mapCommandWithSuccessfulGuard(done:Function) {
+    mapCommandWithSuccessfulGuard(done:() => void) {
         const eventName:string = "test";
         const guard:EventGuard = () => {
             return true;
@@ -127,6 +190,58 @@ import {Injector} from "../../src/injector/Injector";
         ).to.be.eq(0);
 
         this.commandMap.trigger(eventName);
+    }
+
+    @test("unMap command twice")
+    unMapCommandTwice() {
+        const eventName:string = "test";
+        const eventName2:string = "test2";
+
+        this.commandMap.map(eventName, CustomCommand);
+        this.commandMap.map(eventName2, CustomCommand);
+
+        expect(
+            this.commandMap.unMap(eventName, CustomCommand),
+            "First unMap should be successful"
+        ).to.be.true;
+
+        expect(
+            this.commandMap.unMap(eventName, CustomCommand),
+            "Second unMap should not have anything to unMap"
+        ).to.be.false;
+    }
+
+    @test("unMap command from two different events")
+    unMapCommandFromTwoEvents() {
+        const eventName:string = "test";
+        const eventName2:string = "test2";
+
+        this.commandMap.map(eventName, CustomCommand);
+        this.commandMap.map(eventName2, CustomCommand);
+
+        expect(
+            this.commandMap.unMap(eventName, CustomCommand),
+            "First unMap should be successful"
+        ).to.be.true;
+
+        expect(
+            this.commandMap.unMap(eventName2, CustomCommand),
+            "Second unMap should be successful"
+        ).to.be.true;
+    }
+
+    @test("unMap command from wrong event")
+    unMapCommandFromWrongEvent() {
+        const eventName:string = "test";
+        const eventName2:string = "test2";
+
+        this.commandMap.map(eventName2, CustomCommand2);
+        this.commandMap.map(eventName, CustomCommand);
+
+        expect(
+            this.commandMap.unMap(eventName2, CustomCommand),
+            "unMap should return false because there is no mapping"
+        ).to.be.false;
     }
 
     @test("unMap all commands from event")
@@ -202,9 +317,56 @@ import {Injector} from "../../src/injector/Injector";
         }
     }
 
+    @test("Macro command add")
+    macroCommandAdd() {
+        const macroCommand:MacroCommand = new MacroCommand();
+        macroCommand.add(CustomCommand);
+
+        expect(
+            macroCommand.has(CustomCommand),
+            "Macro command should have CustomCommand"
+        ).to.be.true;
+
+        expect(
+            macroCommand.has(CustomCommand2),
+            "Macro command should not have CustomCommand2"
+        ).to.be.false;
+
+        expect(
+            () => macroCommand.add(null),
+            "Trying to add a null command should throw an error"
+        ).to.throw(Error);
+    }
+
+    @test("Macro command remove")
+    macroCommandRemove() {
+        const macroCommand:MacroCommand = new MacroCommand();
+        macroCommand.add(CustomCommand);
+
+        expect(
+            () => macroCommand.remove(CustomCommand),
+            "Removing the command should be successful"
+        ).to.not.throw(Error);
+
+        expect(
+            macroCommand.has(CustomCommand),
+            "Macro command should not have CustomCommand after remove"
+        ).to.be.false;
+
+        expect(
+            () => macroCommand.remove(CustomCommand),
+            "Trying to remove a command which is not added should throw an error"
+        ).to.throw(Error);
+
+        expect(
+            () => macroCommand.remove(null),
+            "Trying to remove a null command should throw an error"
+        ).to.throw(Error);
+    }
+
     @test("Macro command execute")
     @timeout(500) //Limit waiting time in case the callback is not called
-    macroCommandExecute(done:Function) {
+    macroCommandExecute(done:() => void) {
         const eventName:string = "test";
         CustomMacroCommand.done = done;
 
