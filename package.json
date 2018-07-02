@@ -38,7 +38,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/kristapsPelna/Quiver-Framework"
+    "url": "https://github.com/janis-r/Quiver-Framework"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.12"
@@ -58,7 +58,7 @@
     "systemjs": "0.20.12",
     "tslint": "^5.2.0",
     "typedoc": "0.6.0",
-    "typescript": "2.3.0",
+    "typescript": "^2.3.0",
     "yarn": "^0.24.4"
   }
 }

@@ -7,8 +7,8 @@ import {Injector} from "../Injector";
  */
 export class ExistingMappingProvider implements InjectionValueProvider {
 
-    constructor(private injector:Injector,
-                private type:Type<any>) {
+    constructor(private injector: Injector,
+                private type: Type) {
 
     }
 

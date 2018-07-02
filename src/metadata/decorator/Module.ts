@@ -10,7 +10,7 @@ import {Injectable} from "./Injectable";
  * @author Jānis Radiņš
  */
 export function Module(descriptor:ModuleDescriptor):Function {
-    return (target:Type<any>):Type<any> => {
+    return (target: Type): Type => {
         //Invoke Injectable just as we have a Module entry
         Injectable()(target);
         metadataInternal.getTypeDescriptor(target).setModuleDescriptor(descriptor);

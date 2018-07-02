@@ -9,8 +9,8 @@ import {ContextLifecycleEvent} from "../../event/ContextLifecycleEvent";
  */
 export class MediatorMapExtension implements ContextExtension {
 
-    private context:Context;
-    private mediatorMap:MediatorMap;
+    private context: Context;
+    private mediatorMap: MediatorMap;
 
     extend(context: Context): void {
         this.context = context;
@@ -23,16 +23,16 @@ export class MediatorMapExtension implements ContextExtension {
         context.listenOnce(ContextLifecycleEvent.POST_INITIALIZE, this.removeInitListeners, this);
 
         context.addEventListener(ContextModuleEvent.REGISTER_MODULE, this.createModuleMappings, this)
-            .withGuards((event:ContextModuleEvent):boolean => {
+            .withGuards((event: ContextModuleEvent): boolean => {
                 return !!(event.moduleDescriptor && event.moduleDescriptor.mediate);
             });
     }
 
-    private removeInitListeners():void {
+    private removeInitListeners(): void {
         this.context.removeAllEventListeners(this);
     }
 
-    private createModuleMappings(event:ContextModuleEvent):void {
+    private createModuleMappings(event: ContextModuleEvent): void {
         for (let mapping of event.moduleDescriptor.mediate) {
             this.mediatorMap.map(mapping.view, mapping.mediator);
         }

@@ -7,16 +7,16 @@ import {TypeMetadata} from "../data/TypeMetadata";
  */
 export class MetadataCollection {
 
-    private rawTypeMetadata:Map<Type<any>, TypeMetadataInternal> = new Map<Type<any>, TypeMetadataInternal>();
-    private exportedTypeMetadata:Map<Type<any>, TypeMetadata> = new Map<Type<any>, TypeMetadata>();
-    private inheritedMetadata:Map<Type<any>, TypeMetadata[]> = new Map<Type<any>, TypeMetadata[]>();
+    private rawTypeMetadata = new Map<Type, TypeMetadataInternal>();
+    private exportedTypeMetadata = new Map<Type, TypeMetadata>();
+    private inheritedMetadata = new Map<Type, TypeMetadata[]>();
 
     /**
      * Get or create internal type metadata object
      * @param type
      * @returns {TypeMetadataInternal}
      */
-    getOrCreateTypeMetadata(type:Type<any>):TypeMetadataInternal {
+    getOrCreateTypeMetadata(type: Type): TypeMetadataInternal {
         if (!this.rawTypeMetadata.has(type)) {
             this.rawTypeMetadata.set(type, new TypeMetadataInternal(type));
         }
@@ -29,7 +29,7 @@ export class MetadataCollection {
      * @throws Error if unre4gistered metadata is requested
      * @returns {TypeMetadata}
      */
-    getTypeMetadataExportFormat(type:Type<any>):TypeMetadata {
+    getTypeMetadataExportFormat(type: Type): TypeMetadata {
         if (!this.rawTypeMetadata.has(type)) {
             throw new Error(`Type metadata for ${type} is not registered`);
         }
@@ -45,7 +45,7 @@ export class MetadataCollection {
      * @param type
      * @returns {boolean}
      */
-    typeMetadataIsRegistered(type:Type<any>):boolean {
+    typeMetadataIsRegistered(type: Type): boolean {
         return this.rawTypeMetadata.has(type);
     }
 
@@ -54,16 +54,16 @@ export class MetadataCollection {
      * @param instance Any class instance that might be inheriting from any of metadata clients
      * @returns {TypeMetadata[]} A collection of all metadata entries that can be matched with instance
      */
-    getInheritedMetadata(instance:any):TypeMetadata[] {
+    getInheritedMetadata(instance: any): TypeMetadata[] {
 
-        const instanceType:Type<any> = instance.constructor;
+        const instanceType: Type = instance.constructor;
 
         if (this.inheritedMetadata.has(instanceType)) {
             return this.inheritedMetadata.get(instanceType);
         }
 
-        let parentTypeMetadata:TypeMetadata[] = [];
-        this.rawTypeMetadata.forEach((typeDef:TypeMetadataInternal) => {
+        const parentTypeMetadata: TypeMetadata[] = [];
+        this.rawTypeMetadata.forEach((typeDef: TypeMetadataInternal) => {
             if (instance instanceof typeDef.type) {
                 parentTypeMetadata.push(this.getTypeMetadataExportFormat(typeDef.type));
             }

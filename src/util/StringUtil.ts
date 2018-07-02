@@ -5,8 +5,8 @@ import {Type} from "../type/Type";
  * @param type
  * @returns {string}
  */
-export function typeReferenceToString(type:Type<any>):string {
-    let str:string = String(type);
+export function typeReferenceToString(type: Type): string {
+    const str = String(type);
     if (str.match(/^function/)) {
         return str.match(/^function (\w+\([^\)]*\))/)[1];
     }

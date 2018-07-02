@@ -6,10 +6,10 @@ import {Type} from "../../type/Type";
  * @author Jānis Radiņš
  */
 export function Optional():Function {
-    return (target:Type<any>, key:string, index:number|Object):Type<any> => {
+    return (target: Type, key: string, index: number | Object): Type => {
         if (key && !index) {
             // We have a class property mapping in here
-            metadataInternal.getTypeDescriptor(<Type<any>> target.constructor).setOptionalPropertyInjection(key);
+            metadataInternal.getTypeDescriptor(<Type> target.constructor).setOptionalPropertyInjection(key);
         } else if (!key && typeof index === "number") {
             //This one is a constructor param entry
             metadataInternal.getTypeDescriptor(target).setOptionalConstructorArgument(index);

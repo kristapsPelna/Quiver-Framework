@@ -6,8 +6,7 @@ import {MetadataCollection} from "./model/MetadataCollection";
 let metadataCollection:MetadataCollection = new MetadataCollection();
 
 /**
- * Interal metadata provider that should be used only within metadata package
- * @type {{getTypeDescriptor: ((type:Type<any>)=>TypeMetadataInternal)}}
+ * Internal metadata provider that should be used only within metadata package
  */
 export const metadataInternal = {
     /**
@@ -16,14 +15,13 @@ export const metadataInternal = {
      * @param type
      * @returns {TypeMetadataInternal}
      */
-    getTypeDescriptor: (type: Type<any>):TypeMetadataInternal => {
+    getTypeDescriptor: (type: Type): TypeMetadataInternal => {
         return metadataCollection.getOrCreateTypeMetadata(type);
     }
 };
 
 /**
  * Public data provider for registered type metadata
- * @type {{hasMetadata: ((type:Type<any>)=>boolean); getTypeDescriptor: ((type:Type<any>)=>TypeMetadata)}}
  */
 export const metadata = {
     /**
@@ -31,7 +29,7 @@ export const metadata = {
      * @param type
      * @returns {boolean}
      */
-    hasMetadata:(type:Type<any>):boolean => {
+    hasMetadata: (type: Type): boolean => {
         return metadataCollection.typeMetadataIsRegistered(type);
     },
 
@@ -40,7 +38,7 @@ export const metadata = {
      * @param type
      * @returns {TypeMetadataInternal}
      */
-    getTypeDescriptor:(type:Type<any>):TypeMetadata => {
+    getTypeDescriptor: (type: Type): TypeMetadata => {
         return metadataCollection.getTypeMetadataExportFormat(type);
     },
 
@@ -49,7 +47,7 @@ export const metadata = {
      * @param instance Any class instance that might be inheriting from any of metadata clients
      * @returns {TypeMetadata[]} A collection of all metadata entries that can be matched with instance
      */
-    getInheritedMetadata(instance:any):TypeMetadata[] {
+    getInheritedMetadata(instance: any): TypeMetadata[] {
         return metadataCollection.getInheritedMetadata(instance);
     }
 };

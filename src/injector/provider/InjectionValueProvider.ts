@@ -7,11 +7,11 @@ export interface InjectionValueProvider {
     /**
      * Implement providing of mapped value
      */
-    getProviderValue():any;
+    getProviderValue(): any;
 
     /**
      * Implement clearCommandMap of provided instance that will be invoked as provider instance if to be destroyed.
      */
-    destroy?():void;
+    destroy?(): void;
 
 }

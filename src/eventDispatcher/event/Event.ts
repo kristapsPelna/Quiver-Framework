@@ -5,16 +5,17 @@
  */
 export class Event {
 
-    private _defaultPrevented:boolean = false;
+    private _defaultPrevented: boolean = false;
 
     /**
      * Create new instance
      * @param {string} type Event string type
      * @param data Data shipped along with event notification, if any
      */
-    constructor(public readonly type:string,
-                public readonly data?:any
-    ) {}
+    constructor(public readonly type: string,
+                public readonly data?: any
+    ) {
+    }
 
     /**
      * Flag which indicates that somewhere within event listeners default event action has been prevented
@@ -27,7 +28,7 @@ export class Event {
     /**
      * Prevent event default action
      */
-    preventDefault():void {
+    preventDefault(): void {
         this._defaultPrevented = true;
     }
 
@@ -35,7 +36,7 @@ export class Event {
      * Get a string representation of the event
      * @returns {string}
      */
-    toString():string {
+    toString(): string {
         return `[Event type=${this.type}, data=${this.data}]`;
     }
 
