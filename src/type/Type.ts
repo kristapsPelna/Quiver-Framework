@@ -1,9 +1,6 @@
-// export const Type = Function;
+/**
+ * Constructable class type definition
+ */
 export interface Type<T = any> extends Function {
     new (...args: any[]): T;
 }
-
-/*
-export interface ClassType<T = any> extends Function {
-    new (...args: any[]): T;
-}*/

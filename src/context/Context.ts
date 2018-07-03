@@ -129,7 +129,7 @@ export class Context extends EventDispatcher {
      * Initialize context - install extensions, map modules and move through init lifecycle phases
      * @throws Error on repeated call
      */
-    initialize(): void | Error {
+    initialize(): void {
         if (this._initialized) {
             throw new Error("Context is already installed");
         }

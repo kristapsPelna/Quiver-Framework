@@ -1,4 +1,5 @@
 import {Type} from "../../type/Type";
+import {ClassType} from "../../type/ClassType";
 import {Injector} from "../Injector";
 import {InjectionValueProvider} from "../provider/InjectionValueProvider";
 import {ClassProvider} from "../provider/ClassProvider";
@@ -25,12 +26,12 @@ export class InjectionMapping {
      * @param injector Hosting Injector instance of current mapping
      * @param masterSealKey Master seal key is necessary for unsealed by injector during destroy
      */
-    constructor(public readonly type: Type,
+    constructor(public readonly type: ClassType,
                 public readonly injector: Injector,
                 private readonly masterSealKey: Object) {
         this.defaultProviderSet = true;
         //Set class provider as a default value provider
-        this.setProvider(new ClassProvider(injector, type));
+        this.setProvider(new ClassProvider(injector, type as Type));
     }
 
     //------------------------------
@@ -63,7 +64,7 @@ export class InjectionMapping {
      * @returns {InjectionMapping} The InjectionMapping the method is invoked on
      */
     asSingleton(): this {
-        this.setProvider(new SingletonProvider(this.injector, this.type));
+        this.setProvider(new SingletonProvider(this.injector, this.type as Type));
         return this;
     }
 
@@ -104,7 +105,7 @@ export class InjectionMapping {
      * @param type Exsting mapping type to use as for a return value.
      * @returns {InjectionMapping} The InjectionMapping the method is invoked on
      */
-    toExisting(type: Type): this {
+    toExisting(type: ClassType): this {
         this.provider = new ExistingMappingProvider(this.injector, type);
         return this;
     }
@@ -168,7 +169,7 @@ export class InjectionMapping {
     //  Private methods
     //------------------------------
 
-    private setProvider(provider: InjectionValueProvider): void | Error {
+    private setProvider(provider: InjectionValueProvider): void {
         if (this._destroyed) {
             throw new Error(`Can't change a destroyed mapping`);
         }

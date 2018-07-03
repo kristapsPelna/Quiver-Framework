@@ -112,14 +112,14 @@ export class CommandMap {
      * Trigger all commands which are mapped to this event.
      * @param event Event object that defines event type and data
      */
-    trigger(event: Event): void | Error;
+    trigger(event: Event): void;
 
     /**
      * Trigger all commands which are mapped to event name.
      * @param eventType String event name commands mapped to which must be invoked.
      * @param eventData Arbitrary data to be passed along with command invocation.
      */
-    trigger(eventType: string, eventData?: any): void | Error;
+    trigger(eventType: string, eventData?: any): void;
 
     /**
      * Trigger all commands which are mapped to event name.
@@ -127,7 +127,7 @@ export class CommandMap {
      * @param eventData Arbitrary data to be passed along with command invocation.
      * @private
      */
-    trigger(eventTypeOrEvent: Event | string, eventData?: any): void | Error {
+    trigger(eventTypeOrEvent: Event | string, eventData?: any): void {
         if (!eventTypeOrEvent) {
             throw new Error("CommandMap: Event type or value can not be null");
         }

@@ -1,6 +1,6 @@
 import {InjectionValueProvider} from "./InjectionValueProvider";
-import {Type} from "../../type/Type";
 import {Injector} from "../Injector";
+import {ClassType} from "../../type/ClassType";
 /**
  * Provide value of existing mapping of required type
  * @author Jānis Radiņš
@@ -8,7 +8,7 @@ import {Injector} from "../Injector";
 export class ExistingMappingProvider implements InjectionValueProvider {
 
     constructor(private injector: Injector,
-                private type: Type) {
+                private type: ClassType) {
 
     }
 
