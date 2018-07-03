@@ -19,7 +19,7 @@ export class CommandMapExtension implements ContextExtension {
     private commandMapMapping: InjectionMapping;
     private commandMap: CommandMap;
 
-    extend(context:Context): void {
+    extend(context: Context): void {
         this.context = context;
 
         //Map default CommandMap implementation to injector but don't seal it yet before Context is not initialized
@@ -31,12 +31,12 @@ export class CommandMapExtension implements ContextExtension {
         context.listenOnce(ContextLifecycleEvent.DESTROY, this.clearCommandMap, this);
 
         context.addEventListener(ContextModuleEvent.REGISTER_MODULE, this.createModuleMappings, this)
-            .withGuards((event:ContextModuleEvent):boolean => {
+            .withGuards((event: ContextModuleEvent): boolean => {
                 return !!(event.moduleDescriptor && event.moduleDescriptor.commandMap);
             });
     }
 
-    private mapCustomEventDispatcher():void {
+    private mapCustomEventDispatcher(): void {
         //If default event dispatcher is already mapped - remove it
         if (this.context.injector.hasDirectMapping(EventDispatcher)) {
             this.context.injector.unMap(EventDispatcher);
@@ -45,23 +45,23 @@ export class CommandMapExtension implements ContextExtension {
         this.context.injector.map(EventDispatcher).toSingleton(EventDispatcherForCommandMap);
     }
 
-    private sealCommandMap():void {
+    private sealCommandMap(): void {
         this.commandMapMapping.seal();
         this.commandMap = this.context.injector.get(CommandMap);
     }
 
-    private clearCommandMap():void {
+    private clearCommandMap(): void {
         //Clear all command mappings as context is destroyed
         this.commandMap.unMap();
     }
 
-    private removeInitListeners():void {
+    private removeInitListeners(): void {
         this.context.removeAllEventListeners(this);
     }
 
-    private createModuleMappings(event:ContextModuleEvent):void {
+    private createModuleMappings(event: ContextModuleEvent): void {
         for (let mapping of event.moduleDescriptor.commandMap) {
-            let commandMapping:CommandMapping = this.commandMap.map(mapping.event, mapping.command);
+            let commandMapping: CommandMapping = this.commandMap.map(mapping.event, mapping.command);
             if ("once" in mapping && mapping.once === true) {
                 commandMapping.once();
             }

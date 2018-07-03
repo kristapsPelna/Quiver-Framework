@@ -9,5 +9,5 @@ export interface EventListener {
     /**
      * @param event Optional parameter for receiving Event data passed by the event dispatch.
      */
-    (event?:Event):void;
+    (event?: Event): void;
 }

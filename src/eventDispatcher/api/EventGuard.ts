@@ -12,5 +12,5 @@ export interface EventGuard {
      * @returns {boolean} True in case if guard function is letting execution through or false if
      * execution should be prevented.
      */
-    (event?:Event):boolean;
+    (event?: Event): boolean;
 }

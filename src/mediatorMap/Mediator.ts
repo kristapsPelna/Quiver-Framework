@@ -5,21 +5,21 @@ import {PreDestroy} from "../metadata/decorator/PreDestroy";
  * @author Jānis Radiņš
  */
 export abstract class Mediator {
-    
+
     /**
      * Initialize mediator.
      */
     @PostConstruct()
-    initialize():void {
+    initialize(): void {
 
     }
-    
+
     /**
      * Destroy mediator.
      */
     @PreDestroy()
-    destroy():void {
-        
+    destroy(): void {
+
     }
-    
+
 }

@@ -7,20 +7,20 @@ import {Injector} from "../Injector";
  */
 export class SingletonProvider implements InjectionValueProvider {
 
-    private instance:any;
+    private instance: any;
 
-    constructor(private injector:Injector,
-                private type:Type<any>) {
+    constructor(private injector: Injector,
+                private type: Type) {
     }
 
-    getProviderValue():any {
+    getProviderValue(): any {
         if (!this.instance) {
             this.instance = this.injector.instantiateInstance(this.type, true);
         }
         return this.instance;
     }
 
-    destroy():void {
+    destroy(): void {
         if (this.instance) {
             this.injector.destroyInstance(this.instance);
             this.instance = null;

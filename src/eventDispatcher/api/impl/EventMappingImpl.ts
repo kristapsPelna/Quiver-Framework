@@ -9,16 +9,16 @@ import {Event} from "../../event/Event";
  */
 export class EventMappingImpl implements EventMapping {
 
-    private static EVENT_MAPPING_ID:number = 0;
+    private static EVENT_MAPPING_ID: number = 0;
 
     /**
      * Unique id of a mapping.
      * @returns {number}
      */
-    readonly id:number = EventMappingImpl.EVENT_MAPPING_ID++;
+    readonly id = EventMappingImpl.EVENT_MAPPING_ID++;
 
-    private guards:EventGuard[] = [];
-    private _executeOnce:boolean = false;
+    private guards: EventGuard[] = [];
+    private _executeOnce: boolean = false;
 
     /**
      * Create new mapping
@@ -26,16 +26,16 @@ export class EventMappingImpl implements EventMapping {
      * @param listener  Listener function.
      * @param context   Listener scope to apply as it is executed
      */
-    constructor(public readonly event:string,
-                public readonly listener:EventListener,
-                public readonly context:Object) {
+    constructor(public readonly event: string,
+                public readonly listener: EventListener,
+                public readonly context: Object) {
     }
 
     /**
      * Defines if this event mapping should be executed only once.
      * @returns {boolean}
      */
-    get executeOnce():boolean {
+    get executeOnce(): boolean {
         return this._executeOnce;
     }
 
@@ -43,7 +43,7 @@ export class EventMappingImpl implements EventMapping {
      * Mark event mapping to be executed only once.
      * @returns {EventMappingImpl} so we can call other methods of this class instantly from return value
      */
-    once():this {
+    once(): this {
         this._executeOnce = true;
         return this;
     }
@@ -54,7 +54,7 @@ export class EventMappingImpl implements EventMapping {
      * @param guards List of EventGuard callback methods that might prevent execution of listener.
      * @returns {EventMappingImpl} so we can call other methods of this class instantly from return value
      */
-    withGuards(... guards:EventGuard[]):this {
+    withGuards(...guards: EventGuard[]): this {
         this.guards = this.guards.concat(guards);
         return this;
     }
@@ -64,8 +64,8 @@ export class EventMappingImpl implements EventMapping {
      * @param event Event object to be dispatched.
      * @returns {boolean} True if guards aren't set or none of them has reason to stop event execution.
      */
-    executionAllowedByGuards(event:Event):boolean {
-        for (let guard of this.guards) {
+    executionAllowedByGuards(event: Event): boolean {
+        for (const guard of this.guards) {
             if (!guard(event)) {
                 return false;
             }

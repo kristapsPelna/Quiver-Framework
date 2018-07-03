@@ -13,15 +13,12 @@ import {Event} from "../../eventDispatcher/event/Event";
 export class MacroCommand extends AsyncCommand {
 
     @Inject()
-    protected injector:Injector;
+    protected injector: Injector;
 
     @Inject()
-    protected event:Event;
+    protected event: Event;
 
-    protected subCommands:{
-        commandType:Type<Command>,
-        guards?:EventGuard[]
-    }[] = [];
+    protected subCommands: SubCommand[] = [];
 
     //--------------------
     //  Public methods
@@ -33,15 +30,12 @@ export class MacroCommand extends AsyncCommand {
      * @param guards Optional list of event guards for this commands execution
      * @returns {MacroCommand}
      */
-    add(commandType:Type<Command>, guards?:EventGuard[]):this {
+    add(commandType: Type<Command>, guards?: EventGuard[]): this {
         if (!commandType) {
             throw new Error("MacroCommand: Can not add a null command!");
         }
 
-        this.subCommands.push({
-            commandType:commandType,
-            guards:guards
-        });
+        this.subCommands.push({commandType: commandType, guards: guards});
         return this;
     }
 
@@ -50,14 +44,12 @@ export class MacroCommand extends AsyncCommand {
      * @param commandType Type of the Command by which it was added
      * @returns {MacroCommand}
      */
-    remove(commandType:Type<Command>):this {
+    remove(commandType: Type<Command>): this {
         if (!commandType) {
             throw new Error("MacroCommand: Can not remove a null command!");
         }
 
-        let index:number = this.subCommands.indexOf(
-            this.getSubCommand(commandType)
-        );
+        const index = this.subCommands.indexOf(this.getSubCommand(commandType));
         if (index === -1) {
             throw new Error("MacroCommand: A command must be added before it can be removed. Command: " + commandType);
         }
@@ -71,14 +63,14 @@ export class MacroCommand extends AsyncCommand {
      * @param commandType
      * @returns {boolean}
      */
-    has(commandType:Type<Command>):boolean {
+    has(commandType: Type<Command>): boolean {
         return !!this.getSubCommand(commandType);
     }
 
     /**
      * Main macro command execution entry.
      */
-    execute():void {
+    execute(): void {
         this.executeNextCommand();
     }
 
@@ -88,27 +80,23 @@ export class MacroCommand extends AsyncCommand {
 
     /**
      * Get Command type and guard data
-     * @param commandType Command type
-     * @returns {any}
+     * @param {Type<Command>} commandType Command type
+     * @returns {SubCommand}
      */
-    private getSubCommand(commandType:Type<Command>):{commandType:Type<Command>, guards?:EventGuard[]} {
-        for (let subCommand of this.subCommands) {
-            if (subCommand.commandType === commandType) {
-                return subCommand;
-            }
-        }
-        return null;
+    private getSubCommand(commandType: Type<Command>): SubCommand {
+        return this.subCommands.find(subCommand => subCommand.commandType === commandType);
     }
 
     /**
      * Find if command execution is allowed by guards.
      * @returns {boolean} True if guards aren't set or none of them has reason to stop execution.
      */
-    private executionAllowedByGuards(guards?:EventGuard[]):boolean {
+    private executionAllowedByGuards(guards?: EventGuard[]): boolean {
         if (!guards) {
             return true;
         }
-        for (let guard of guards) {
+
+        for (const guard of guards) {
             if (!guard(this.event)) {
                 return false;
             }
@@ -124,16 +112,13 @@ export class MacroCommand extends AsyncCommand {
      * Execute next command from the subCommands list as FiFo (first in, first out).
      * If there are no commands left, executeComplete will be called.
      */
-    protected executeNextCommand():void {
+    protected executeNextCommand(): void {
         if (this.subCommands.length === 0) {
             this.complete();
             return;
         }
 
-        let commandDescriptor:{
-            commandType:Type<Command>,
-            guards?:EventGuard[]
-        } = this.subCommands.shift();
+        const commandDescriptor = this.subCommands.shift();
 
         //If execution is blocked by a guard, then move to the next command at once
         if (!this.executionAllowedByGuards(commandDescriptor.guards)) {
@@ -141,10 +126,10 @@ export class MacroCommand extends AsyncCommand {
             return;
         }
 
-        let command:Command = this.injector.instantiateInstance(commandDescriptor.commandType);
+        const command = this.injector.instantiateInstance(commandDescriptor.commandType);
 
         if (command instanceof AsyncCommand) {
-            (command as AsyncCommand).listenOnComplete(
+            command.listenOnComplete(
                 () => this.commandComplete(command, commandDescriptor.commandType)
             );
             command.execute();
@@ -159,8 +144,13 @@ export class MacroCommand extends AsyncCommand {
      * @param commandInstance Instance of the command which has just completed
      * @param commandType Type/class of the executed command
      */
-    protected commandComplete(commandInstance:Command, commandType:Type<Command>):void {
+    protected commandComplete(commandInstance: Command, commandType: Type<Command>): void {
         this.executeNextCommand();
     }
 
 }
+
+export type SubCommand = {
+    commandType: Type<Command>,
+    guards?: EventGuard[]
+};

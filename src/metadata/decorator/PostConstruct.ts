@@ -8,8 +8,8 @@ import {Type} from "../../type/Type";
  * @author Jānis Radiņš
  */
 export function PostConstruct():Function {
-    return (target:Type<any>, method:string):Type<any> => {
-        metadataInternal.getTypeDescriptor(<Type<any>> target.constructor).addPostConstructMethod(method);
+    return (target: Type, method: string): Type => {
+        metadataInternal.getTypeDescriptor(<Type> target.constructor).addPostConstructMethod(method);
         return target;
     };
 }

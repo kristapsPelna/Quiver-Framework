@@ -1,6 +1,6 @@
 import {Event} from "../../eventDispatcher/event/Event";
 import {InjectionMapping} from "../data/InjectionMapping";
-import {Type} from "../../type/Type";
+import {ClassType} from "../../type/ClassType";
 
 export class MappingEvent extends Event {
 
@@ -12,27 +12,26 @@ export class MappingEvent extends Event {
      * changes should be done by first removing the existing mapping.
      * @type {string}
      */
-    static readonly MAPPING_OVERRIDE: string = 'mappingOverride';
+    static readonly MAPPING_OVERRIDE = 'mappingOverride';
 
     /**
      * This event is dispatched when a new mapping is created.
      * @type {string}
      */
-    static readonly MAPPING_CREATED: string = 'mappingCreated';
+    static readonly MAPPING_CREATED = 'mappingCreated';
 
     /**
      * This event is dispatched when a mapping is destroyed.
      * @type {string}
      */
-    static readonly MAPPING_DESTROYED: string = 'mappingDestroyed';
+    static readonly MAPPING_DESTROYED = 'mappingDestroyed';
 
-    readonly mappedType: Type<any>;
-    readonly mapping: InjectionMapping;
 
-    constructor(type:string, mappedType: Type<any>, mapping: InjectionMapping) {
+    constructor(type: string,
+                public readonly mappedType: ClassType,
+                public readonly mapping: InjectionMapping) {
         super(type);
-        this.mappedType = mappedType;
-        this.mapping = mapping;
+
     }
 
 }

@@ -8,22 +8,22 @@ import {typeReferenceToString} from "../../util/StringUtil";
  */
 export class TypeMetadataInternal {
 
-    private _constructorArguments:Type<any>[];
-    private _optionalConstructorArguments:number[] = [];
+    private _constructorArguments: Type[];
+    private _optionalConstructorArguments: number[] = [];
 
-    private _propertyInjections:Map<string, Type<any>> = new Map<string, Type<any>>();
-    private _optionalPropertyInjections:string[] = [];
+    private _propertyInjections = new Map<string, Type>();
+    private _optionalPropertyInjections: string[] = [];
 
-    private _postConstructMethods:string[] = [];
-    private _preDestroyMethods:string[] = [];
-    private _mappedInterfaces:Type<any>[] = [];
-    private _moduleDescriptor:ModuleDescriptor;
+    private _postConstructMethods: string[] = [];
+    private _preDestroyMethods: string[] = [];
+    private _mappedInterfaces: Type[] = [];
+    private _moduleDescriptor: ModuleDescriptor;
 
     /**
      * Create new instance
      * @param type Type of class prototype this instance holds metadataInternal for
      */
-    constructor(public readonly type:Type<any>) {
+    constructor(public readonly type: Type) {
 
     }
 
@@ -33,9 +33,9 @@ export class TypeMetadataInternal {
 
     /**
      * List of type constructor arguments data types
-     * @returns {Type<any>[]}
+     * @returns {Type[]}
      */
-    get constructorArguments(): Type<any>[] {
+    get constructorArguments(): Type[] {
         return this._constructorArguments;
     }
 
@@ -51,9 +51,9 @@ export class TypeMetadataInternal {
     /**
      * List of type property name and data type pairs that should be filled with values from Injector as instance
      * of this type is created.
-     * @returns {Map<string, Type<any>>}
+     * @returns {Map<string, Type>}
      */
-    get propertyInjections(): Map<string, Type<any>> {
+    get propertyInjections(): Map<string, Type> {
         return this._propertyInjections;
     }
 
@@ -84,9 +84,9 @@ export class TypeMetadataInternal {
 
     /**
      * List of interfaces that are mapped to type.
-     * @returns {Type<any>[]}
+     * @returns {Type[]}
      */
-    get mappedInterfaces(): Type<any>[] {
+    get mappedInterfaces(): Type[] {
         return this._mappedInterfaces;
     }
 
@@ -102,21 +102,21 @@ export class TypeMetadataInternal {
     //  Public methods
     //-----------------------
 
-    setConstructorArguments(value: Type<any>[]):void|Error {
+    setConstructorArguments(value: Type[]): void {
         if (this._constructorArguments) {
             throw new Error("Double set of type constructor arguments is attempted and that is clear error!");
         }
         this._constructorArguments = value;
     }
 
-    setOptionalConstructorArgument(index:number):void|Error {
+    setOptionalConstructorArgument(index: number): void {
         if (this._optionalConstructorArguments.indexOf(index) !== -1) {
             throw new Error("Double set of optional constructor argument!");
         }
         this._optionalConstructorArguments.push(index);
     }
 
-    addPropertyInjection(name:string, type:Type<any>):void|Error {
+    addPropertyInjection(name: string, type: Type): void {
         if (this._propertyInjections.get(name)) {
             throw new Error(`Double set of property ${name} injection to ${typeReferenceToString(type)}`);
         }
@@ -124,35 +124,35 @@ export class TypeMetadataInternal {
         this._propertyInjections.set(name, type);
     }
 
-    setOptionalPropertyInjection(name:string):void|Error {
+    setOptionalPropertyInjection(name: string): void {
         if (this._optionalPropertyInjections.indexOf(name) !== -1) {
             throw new Error("Double set of optional proprety injection!");
         }
         this._optionalPropertyInjections.push(name);
     }
 
-    addPostConstructMethod(name:string):void|Error {
+    addPostConstructMethod(name: string): void {
         if (this._postConstructMethods.indexOf(name) !== -1) {
             throw new Error(`Double register of post construct method ${name} to ${typeReferenceToString(this.type)}`);
         }
         this._postConstructMethods.push(name);
     }
 
-    addPreDestroyMethod(name:string):void|Error {
+    addPreDestroyMethod(name: string): void {
         if (this._preDestroyMethods.indexOf(name) !== -1) {
             throw new Error(`Double register of pre destroy method ${name} to ${typeReferenceToString(this.type)}`);
         }
         this._preDestroyMethods.push(name);
     }
 
-    setMappedInterfaces(value: Type<any>[]):void|Error {
+    setMappedInterfaces(value: Type[]): void {
         if (this._mappedInterfaces.length > 0) {
             throw new Error("Double set of mapped interfaces is attempted and that is clear error!");
         }
         this._mappedInterfaces = value;
     }
 
-    setModuleDescriptor(descriptor:ModuleDescriptor):void|Error {
+    setModuleDescriptor(descriptor: ModuleDescriptor): void {
         if (this._moduleDescriptor) {
             throw new Error("Double set of module descriptor and that is clear error!");
         }
