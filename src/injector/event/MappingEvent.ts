@@ -1,6 +1,6 @@
 import {Event} from "../../eventDispatcher/event/Event";
 import {InjectionMapping} from "../data/InjectionMapping";
-import {Type} from "../../type/Type";
+import {ClassType} from "../../type/ClassType";
 
 export class MappingEvent extends Event {
 
@@ -28,7 +28,7 @@ export class MappingEvent extends Event {
 
 
     constructor(type: string,
-                public readonly mappedType: Type,
+                public readonly mappedType: ClassType,
                 public readonly mapping: InjectionMapping) {
         super(type);
 
