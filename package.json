@@ -1,7 +1,7 @@
 {
   "name": "quiver-framework",
   "description": "Lightweight micro framework for TypeScript/JavaScript",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "scripts": {
     "start": "serve",
     "export": "rimraf dist && tsc && copy README.md dist",
