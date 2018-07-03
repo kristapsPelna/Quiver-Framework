@@ -7,15 +7,15 @@ export interface InjectionDescriptor {
 
     /**
      * Injection mapping key which will be used to extract mapping.
-     * (any is added due to the fact that abstract classes do not resolve as Type<any>)
+     * (any is added due to the fact that abstract classes do not resolve as Type)
      */
-    readonly map: Type<any>|any;
+    readonly map: Type | any;
 
     /**
      * Type, instance of which, must be created as injection with signature defined in map
      * property will be requested.
      */
-    readonly useType?: Type<any>;
+    readonly useType?: Type;
 
     /**
      * Value to return as it is provided in here as injection with signature defined in map
@@ -27,7 +27,7 @@ export interface InjectionDescriptor {
      * use existing mapping defined by this property as injection with signature defined in map
      * property will be requested.
      */
-    readonly useExisting?: Type<any>;
+    readonly useExisting?: Type;
 
     /**
      * Provide same instance of mapped instance (true) or create new instance upon any request (false)

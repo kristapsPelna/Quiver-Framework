@@ -13,38 +13,38 @@ export class TypeMetadata {
     /**
      * List of type constructor arguments data types
      */
-    readonly constructorArguments:ConstructorArg[];
+    readonly constructorArguments: ConstructorArg[];
     /**
      * List of injected properties configuration this type expects.
      */
-    readonly propertyInjections:PropertyInjection[];
+    readonly propertyInjections: PropertyInjection[];
     /**
      * List of method names that should be invoked as new instance of type is created and all injection points have
      * got values.
      */
-    readonly postConstructMethods:string[] = [];
+    readonly postConstructMethods: string[] = [];
     /**
      * List of method names that should be invoked as Injected properties are applied to new created class.
      */
-    readonly preDestroyMethods:string[] = [];
+    readonly preDestroyMethods: string[] = [];
     /**
      * List of interfaces that are mapped to type.
      */
-    readonly mappedInterfaces:Type<any>[] = [];
+    readonly mappedInterfaces: Type[] = [];
     /**
      * Module descriptor object that marks type as a module and defines properties of a module entry.
      */
-    readonly moduleDescriptor:ModuleDescriptor;
+    readonly moduleDescriptor: ModuleDescriptor;
 
     /**
      * Create new instance
      * @param typeMeta Type of class prototype this instance holds metadata for
      */
-    constructor(typeMeta:TypeMetadataInternal) {
+    constructor(typeMeta: TypeMetadataInternal) {
         //Parse raw constructor arguments data into more usable format
-        let constructorArguments:ConstructorArg[] = [];
+        const constructorArguments: ConstructorArg[] = [];
         if (typeMeta.constructorArguments) {
-            for (let i:number = 0; i < typeMeta.constructorArguments.length; i++) {
+            for (let i = 0; i < typeMeta.constructorArguments.length; i++) {
                 constructorArguments.push({
                     index: i,
                     type: typeMeta.constructorArguments[i],
@@ -54,9 +54,9 @@ export class TypeMetadata {
         }
         this.constructorArguments = constructorArguments;
         //Parse raw property injections data into more usable format
-        let propertyInjections:PropertyInjection[] = [];
+        const propertyInjections: PropertyInjection[] = [];
         if (typeMeta.propertyInjections.size > 0) {
-            typeMeta.propertyInjections.forEach((type: Type<any>, name: string) => {
+            typeMeta.propertyInjections.forEach((type: Type, name: string) => {
                 propertyInjections.push({
                     name: name,
                     type: type,

@@ -9,39 +9,39 @@ export class ContextLifecycleEvent extends Event {
      * Dispatched as context is just about to be initialized
      * @type {string}
      */
-    static readonly PRE_INITIALIZE:string = "preInitialize";
+    static readonly PRE_INITIALIZE = "preInitialize";
     /**
      * Dispatched as pre initialize is done and actual initialization of Context injector and modules will take place
      * @type {string}
      */
-    static readonly INITIALIZE:string = "initialize";
+    static readonly INITIALIZE = "initialize";
     /**
      * Dispatched as Context initialization is complete
      * @type {string}
      */
-    static readonly POST_INITIALIZE:string = "postInitialize";
+    static readonly POST_INITIALIZE = "postInitialize";
     /**
      * Dispatched as Context destroy is just about to begin.
      * @type {string}
      */
-    static readonly PRE_DESTROY:string = "preDestroy";
+    static readonly PRE_DESTROY = "preDestroy";
     /**
      * Dispatched as actual destroy of Context is performed.
      * @type {string}
      */
-    static readonly DESTROY:string = "clearCommandMap";
+    static readonly DESTROY = "clearCommandMap";
     /**
      * Dispatched as destroyal of Context is complete
      * @type {string}
      */
-    static readonly POST_DESTROY:string = "postDestroy";
+    static readonly POST_DESTROY = "postDestroy";
 
     /**
      * Create new instance
      * @param type Event type
      * @param context Context instance that originated event
      */
-    constructor(type:string, public context:Context) {
+    constructor(type: string, public readonly context: Context) {
         super(type);
     }
 

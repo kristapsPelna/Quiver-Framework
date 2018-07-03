@@ -8,6 +8,8 @@ import {CustomExtendedModel} from "./data/CustomExtendedModel";
 import {ClassWithInjections} from "../metadata/data/ClassWithInjections";
 import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
 import {CustomModelWithPostConstruct} from "./data/CustomModelWithPostConstruct";
+import {AbstractClass} from "./data/AbstractClass";
+import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
 /**
  * Injector test suite
@@ -135,6 +137,15 @@ import {CustomModelWithPostConstruct} from "./data/CustomModelWithPostConstruct"
             this.injector.get(CustomModel2),
             "Model mapped as existing should return the same mapping as for the existing mapping"
         ).to.be.eq(this.injector.get(CustomModel));
+    }
+
+    @test("Map by abstract class")
+    mapByAbstractClass() {
+        this.injector.map(AbstractClass).toType(AbstractClassImpl);
+        expect(
+            this.injector.get(AbstractClass),
+            "Abstract class should be usable as mapping key"
+        ).to.be.instanceof(AbstractClassImpl);
     }
 
     @test("Create subInjector")

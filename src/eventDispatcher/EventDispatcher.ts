@@ -12,7 +12,7 @@ export class EventDispatcher {
     /**
      * List of all event mappings known to event dispatcher
      */
-    private eventMap:EventMappingImpl[] = [];
+    private eventMap: EventMappingImpl[] = [];
 
     //--------------------
     //  Public methods
@@ -28,7 +28,7 @@ export class EventDispatcher {
      * which is to be used in order to set some of mapping properties like <code>once()</code> which will make listener
      * to be executed upon first event dispatch and then be gone.
      */
-    addEventListener(event:string, listener:EventListener, scope?:Object):EventMapping {
+    addEventListener(event: string, listener: EventListener, scope?: Object): EventMapping {
         if (!event) {
             throw new Error("EventDispatcher: Listener can not be added to an invalid event");
         }
@@ -40,8 +40,8 @@ export class EventDispatcher {
             return this.createMapping(event, listener, scope);
         }
 
-        let message:string = "EventDispatcher: addListener already has a mapping. Remove it before calling addListener again.";
-        let info:string = "event:" + event + " listener:" + listener + " scope:" + scope;
+        const message = `EventDispatcher: addListener already has a mapping. Remove it before calling addListener again.`;
+        const info = `event:${event} listener:${listener} scope:${scope}`;
         console.warn(message + " " + info);
 
         return null;
@@ -57,7 +57,7 @@ export class EventDispatcher {
      * which is to be used in order to set some of mapping properties like <code>once()</code> which will make listener
      * to be executed upon first event dispatch and then be gone.
      */
-    listenOnce(event:string, listener:EventListener, scope?:Object):EventMapping {
+    listenOnce(event: string, listener: EventListener, scope?: Object): EventMapping {
         return this.addEventListener(event, listener, scope).once();
     }
 
@@ -68,7 +68,7 @@ export class EventDispatcher {
      * @param scope     Listener scope which will be applied as listener is invoked.
      * @returns {boolean} true if event mapping is found and false otherwise
      */
-    hasEventListener(event:string, listener?:EventListener, scope?:Object):boolean {
+    hasEventListener(event: string, listener?: EventListener, scope?: Object): boolean {
         return this.getEventMappings(event, listener, scope).length > 0;
     }
 
@@ -79,7 +79,7 @@ export class EventDispatcher {
      * @param scope     Listener scope which will be applied as listener is invoked.
      * @returns {boolean} True if event name binding to listener function was found or false if it was found not.
      */
-    removeEventListener(event:string, listener:EventListener, scope?:Object):boolean {
+    removeEventListener(event: string, listener: EventListener, scope?: Object): boolean {
         if (!event) {
             throw new Error("EventDispatcher: Listener can not be removed from an invalid event");
         }
@@ -87,7 +87,7 @@ export class EventDispatcher {
             throw new Error("EventDispatcher: Invalid listener can not be removed");
         }
 
-        let mappings:EventMappingImpl[] = this.getEventMappings(event, listener, scope);
+        const mappings = this.getEventMappings(event, listener, scope);
         if (mappings.length === 0) {
             //No event name to listener mapping has been found
             return false;
@@ -96,10 +96,10 @@ export class EventDispatcher {
             throw new Error("For some reason there are multiple event to listener mappings - that's a clear error!");
         }
 
-        let index:number = this.eventMap.indexOf(mappings[0]);
+        const index = this.eventMap.indexOf(mappings[0]);
         //The index should always be valid because getEventMappings is getting the mapping from the same array
         this.eventMap.splice(index, 1);
-        
+
         return true;
     }
 
@@ -109,8 +109,8 @@ export class EventDispatcher {
      * @param scope     Listener scope from which all listeners mapped to eventType will be removed.
      * @returns {boolean} True if any of mappings have been found; false otherwise.
      */
-    removeEventListeners(eventType:string, scope?:Object):boolean {
-        let mappings:EventMappingImpl[] = this.getEventMappings(eventType, null, scope);
+    removeEventListeners(eventType: string, scope?: Object): boolean {
+        const mappings = this.getEventMappings(eventType, null, scope);
         return this.removeMappings(mappings);
     }
 
@@ -120,7 +120,7 @@ export class EventDispatcher {
      * all listeners will be removed from whole dispatcher instance.
      * @returns {boolean} True if any listeners to remove where found; false otherwise.
      */
-    removeAllEventListeners(scope?:Object):boolean {
+    removeAllEventListeners(scope?: Object): boolean {
         if (this.eventMap.length === 0) {
             return false;
         }
@@ -130,7 +130,7 @@ export class EventDispatcher {
             return true;
         }
 
-        let mappings:EventMappingImpl[] = this.getEventMappings(null, null, scope);
+        const mappings = this.getEventMappings(null, null, scope);
         return this.removeMappings(mappings);
     }
 
@@ -139,7 +139,7 @@ export class EventDispatcher {
      * @param event Event object that defines event type and data
      * @returns {boolean} True if default action of event has not been prevented in any of its listeners.
      */
-    dispatchEvent(event:Event):boolean;
+    dispatchEvent(event: Event): boolean;
 
     /**
      * Dispatch event notification by separate type and data arguments.
@@ -147,7 +147,7 @@ export class EventDispatcher {
      * @param eventData  Arbitrary data to ship along with event dispatch.
      * @returns {boolean} True if default action of event has not been prevented in any of its listeners
      */
-    dispatchEvent(eventType:string, eventData?:any):boolean;
+    dispatchEvent(eventType: string, eventData?: any): boolean;
 
     /**
      * Implement event dispatch from any of method signatures
@@ -156,12 +156,12 @@ export class EventDispatcher {
      * @returns {boolean} True if default action of event has not been prevented in any of its listeners
      * @private
      */
-    dispatchEvent(eventTypeOrEvent:Event|string, eventData?:any):boolean {
+    dispatchEvent(eventTypeOrEvent: Event | string, eventData?: any): boolean {
         if (!eventTypeOrEvent) {
             throw new Error("EventDispatcher: Event type or name can not be null");
         }
 
-        const event:Event = eventTypeOrEvent instanceof Event ? eventTypeOrEvent : new Event(eventTypeOrEvent, eventData);
+        const event = eventTypeOrEvent instanceof Event ? eventTypeOrEvent : new Event(eventTypeOrEvent, eventData);
 
         return this.dispatchEventImpl(event);
     }
@@ -177,9 +177,9 @@ export class EventDispatcher {
      * @param scope     Scope upon which listener should be executed.
      * @returns {EventMappingImpl[]} List of event mappings or empty list if no mappings are found.
      */
-    private getEventMappings(eventType:string, listener?:EventListener, scope?:Object):EventMappingImpl[] {
-        let mappings:EventMappingImpl[] = [];
-        for (let mapping of this.eventMap) {
+    private getEventMappings(eventType: string, listener?: EventListener, scope?: Object): EventMappingImpl[] {
+        const mappings: EventMappingImpl[] = [];
+        for (const mapping of this.eventMap) {
             if (eventType && mapping.event !== eventType) {
                 continue;
             }
@@ -201,8 +201,8 @@ export class EventDispatcher {
      * @param scope     Listener scope which will be mapped.
      * @returns {EventMappingImpl} Instance of the created event mapping.
      */
-    private createMapping(event:string, listener:EventListener, scope?:Object):EventMappingImpl {
-        let mapping:EventMappingImpl = new EventMappingImpl(event, listener, scope);
+    private createMapping(event: string, listener: EventListener, scope?: Object): EventMappingImpl {
+        const mapping = new EventMappingImpl(event, listener, scope);
         this.eventMap.push(mapping);
         return mapping;
     }
@@ -212,12 +212,12 @@ export class EventDispatcher {
      * @param mappings  All mappings to be removed.
      * @returns {boolean} True if mappings have been removed; false if provided mappings are empty.
      */
-    private removeMappings(mappings:EventMappingImpl[]):boolean {
+    private removeMappings(mappings: EventMappingImpl[]): boolean {
         if (!mappings || mappings.length === 0) {
             return false;
         }
         while (mappings.length > 0) {
-            let mapping:EventMappingImpl = mappings.shift();
+            const mapping = mappings.shift();
             this.removeEventListener(mapping.event, mapping.listener, mapping.context);
         }
         return true;
@@ -232,14 +232,14 @@ export class EventDispatcher {
      * @param event Event to dispatch
      * @returns {boolean} True if default action of event has not been prevented in any of its listeners
      */
-    protected dispatchEventImpl(event:Event):boolean {
-        let mappings:EventMappingImpl[] = this.getEventMappings(event.type);
+    protected dispatchEventImpl(event: Event): boolean {
+        const mappings = this.getEventMappings(event.type);
         if (mappings.length === 0) {
             return true;
         }
 
         while (mappings.length > 0) {
-            let mapping:EventMappingImpl = mappings.shift();
+            const mapping = mappings.shift();
             if (!mapping.executionAllowedByGuards(event)) {
                 continue;
             }
@@ -260,7 +260,8 @@ export class EventDispatcher {
      * Number of active listeners on this dispatcher instance.
      * @returns {number}
      */
-    get listenerCount():number {
+    get listenerCount(): number {
         return this.eventMap.length;
     }
+
 }

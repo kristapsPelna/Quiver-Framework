@@ -13,7 +13,7 @@ export interface CommandMappingDescriptor {
     /**
      * Command type that should be invoked as event name listed in event property is fired in system context.
      */
-    readonly command: Type<any>;
+    readonly command: Type;
 
     /**
      * Describes if command should be executed only once.
