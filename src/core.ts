@@ -36,6 +36,8 @@ export * from "./metadata/decorator/Optional";
 export * from "./metadata/decorator/PostConstruct";
 export * from "./metadata/decorator/PreDestroy";
 
+export * from "./type/AbstractType";
+export * from "./type/ClassType";
 export * from "./type/Type";
 
 export * from "./util/StringUtil";
