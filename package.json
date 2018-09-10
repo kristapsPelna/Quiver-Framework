@@ -10,7 +10,7 @@
     "build:minor": "npm run localTest && npm run export && npm version minor && copy package.json dist && npm publish dist",
     "build:major": "npm run localTest && npm run export && npm version major && copy package.json dist && npm publish dist",
 
-    "build:dev": "npm run localTest && npm run export && copy package.json dist && npm --tag dev",
+    "build:dev": "npm run localTest && npm run export && npm version prerelease && copy package.json dist && npm publish dist --tag dev",
 
     "transpileTest": "tsc -p test/tsconfig.json",
     "test": "npm run transpileTest && nyc mocha && nyc report --reporter=json",
