@@ -1,7 +1,7 @@
 {
   "name": "quiver-framework",
   "description": "Lightweight micro framework for TypeScript/JavaScript",
-  "version": "0.7.1",
+  "version": "0.7.2-0",
   "scripts": {
     "start": "serve",
     "export": "rimraf dist && tsc && copy README.md dist",
@@ -9,9 +9,7 @@
     "build:patch": "npm run localTest && npm run export && npm version patch && copy package.json dist && npm publish dist",
     "build:minor": "npm run localTest && npm run export && npm version minor && copy package.json dist && npm publish dist",
     "build:major": "npm run localTest && npm run export && npm version major && copy package.json dist && npm publish dist",
-
     "build:dev": "npm run localTest && npm run export && npm version prerelease && copy package.json dist && npm publish dist --tag dev",
-
     "transpileTest": "tsc -p test/tsconfig.json",
     "test": "npm run transpileTest && nyc mocha && nyc report --reporter=json",
     "posttest": "codecov -f coverage/*.json",
