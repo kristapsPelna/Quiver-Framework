@@ -17,11 +17,11 @@ class CoreTests {
      * The order of their execution is defined by their import order.
      */
     testSuites = [
-        ContextTest,
+        // ContextTest,
         InjectorTest,
-        MetadataTest,
-        EventDispatcherTest,
-        CommandMapTest
+        // MetadataTest,
+        // EventDispatcherTest,
+        // CommandMapTest
     ];
 
 }

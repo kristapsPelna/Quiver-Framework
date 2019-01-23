@@ -17,35 +17,44 @@ export function applyInjectorMapping(mapping: Type | InjectionDescriptor, inject
         if (injector.hasDirectMapping(mappedType)) {
             injector.unMap(mappedType);
         }
+        // Making injector mappings as singletons by default
         injector.map(<Type> mapping).asSingleton();
         return toInstantiate;
     }
 
-    const injection = mapping as InjectionDescriptor;
-    if (typeof injection.map !== "function") {
+    const descriptor = mapping as InjectionDescriptor;
+    if (typeof descriptor.map !== "function") {
         throw new Error("Injection mapping doesn't seem to be a valid object type");
     }
 
-    const injectionMapping = injector.map(injection.map);
-    if (injection.useExisting) {
+    const injectionMapping = injector.map(descriptor.map);
+    if (descriptor.useExisting) {
         // if use existing is set create forward reference and ignore the rest
-        injectionMapping.toExisting(injection.useExisting);
-    } else if (injection.useValue) {
+        injectionMapping.toExisting(descriptor.useExisting);
+    } else if (descriptor.useValue) {
         // Look for use value as next one
-        injectionMapping.toValue(injection.useValue);
-    } else if (injection.useType) {
+        injectionMapping.toValue(descriptor.useValue);
+    } else if (descriptor.useType) {
         // If use type is set map injection to type or to singleton in case if asSingleton is present
-        if ("asSingleton" in injection && !injection.asSingleton) {
-            injectionMapping.toType(injection.useType);
+        if ("asSingleton" in descriptor && !descriptor.asSingleton) {
+            injectionMapping.toType(descriptor.useType);
         } else {
-            injectionMapping.toSingleton(injection.useType);
+            injectionMapping.toSingleton(descriptor.useType);
         }
+    } else if (descriptor.useFactory) {
+        injectionMapping.toFactory(descriptor.useFactory);
+        // Mark it as singleton in case asSingleton is not mentioned or is explicitly set to true
+        // which makes this one a singleton by default
+        if ("asSingleton" in descriptor === false || descriptor.asSingleton) {
+            injectionMapping.asSingleton();
+        }
+
     } else if (injectionMapping.asSingleton) {
         // If everything else fails make mapping as singleton
         injectionMapping.asSingleton();
     }
-    if (injection.instantiate && toInstantiate.indexOf(injection.map) === -1) {
-        toInstantiate.push(injection.map);
+    if (descriptor.instantiate && toInstantiate.indexOf(descriptor.map) === -1) {
+        toInstantiate.push(descriptor.map);
     }
     return toInstantiate;
 }
