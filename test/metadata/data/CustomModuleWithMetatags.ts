@@ -11,6 +11,8 @@ import {PostConstruct} from "../../../src/metadata/decorator/PostConstruct";
 import {PreDestroy} from "../../../src/metadata/decorator/PreDestroy";
 import {CustomInjectedClass} from "./CustomInjectedClass";
 import {CustomCommand} from "../../commandMap/data/CustomCommand";
+import {CustomCommand2} from "../../commandMap/data/CustomCommand2";
+
 /**
  * Custom module class for tests
  * @author Kristaps Peļņa
@@ -36,6 +38,13 @@ import {CustomCommand} from "../../commandMap/data/CustomCommand";
             event: "Test",
             command: CustomCommand,
             once: true
+        },
+        {
+            event: "multiCommandEvent",
+            command: [
+                CustomCommand,
+                CustomCommand2
+            ]
         }
     ]
 })
