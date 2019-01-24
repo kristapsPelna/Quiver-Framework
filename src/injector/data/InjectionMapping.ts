@@ -7,12 +7,11 @@ import {SingletonProvider} from "../provider/SingletonProvider";
 import {ValueProvider} from "../provider/ValueProvider";
 import {ExistingMappingProvider} from "../provider/ExistingMappingProvider";
 import {typeReferenceToString} from "../../util/StringUtil";
-import {FactoryMethod, FactoryProvider} from "../provider/FactoryProvider";
 /**
  * Injector data mapping instance.
  * @author Jānis Radiņš
  */
-export class InjectionMapping<T extends ClassType = any> {
+export class InjectionMapping {
 
     private _sealed: boolean = false;
     private _destroyed: boolean = false;
@@ -27,7 +26,7 @@ export class InjectionMapping<T extends ClassType = any> {
      * @param injector Hosting Injector instance of current mapping
      * @param masterSealKey Master seal key is necessary for unsealed by injector during destroy
      */
-    constructor(public readonly type: T,
+    constructor(public readonly type: ClassType,
                 public readonly injector: Injector,
                 private readonly masterSealKey: Object) {
         this.defaultProviderSet = true;
@@ -65,11 +64,7 @@ export class InjectionMapping<T extends ClassType = any> {
      * @returns {InjectionMapping} The InjectionMapping the method is invoked on
      */
     asSingleton(): this {
-        if (this.provider instanceof FactoryProvider) {
-            this.provider.asSingleton();
-        } else {
-            this.setProvider(new SingletonProvider(this.injector, this.type as Type));
-        }
+        this.setProvider(new SingletonProvider(this.injector, this.type as Type));
         return this;
     }
 
@@ -107,21 +102,11 @@ export class InjectionMapping<T extends ClassType = any> {
 
     /**
      * Makes the mapping return existing mapping from current injector or any of its parents upon each request
-     * @param type Existing mapping type to use as for a return value.
+     * @param type Exsting mapping type to use as for a return value.
      * @returns {InjectionMapping} The InjectionMapping the method is invoked on
      */
     toExisting(type: ClassType): this {
         this.provider = new ExistingMappingProvider(this.injector, type);
-        return this;
-    }
-
-    /**
-     *
-     * @param {FactoryMethod<T extends ClassType>} value
-     * @returns {this}
-     */
-    toFactory(value: FactoryMethod<T>): this {
-        this.provider = new FactoryProvider(this.injector, value);
         return this;
     }
 

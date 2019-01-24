@@ -3,6 +3,8 @@
  * @author Kristaps Peļņa
  */
 export class CustomModel {
-    name: string = "CustomModel";
-    value: number = 100;
+
+    name:string = "CustomModel";
+    value:number = 100;
+
 }
