@@ -11,5 +11,5 @@ export interface ContextExtension {
      * context or subscribe to any of events listed in ContextLifecycleEvent class
      * @param context Current application context which is extended.
      */
-    extend(context:Context):void;
+    extend(context: Context): void;
 }

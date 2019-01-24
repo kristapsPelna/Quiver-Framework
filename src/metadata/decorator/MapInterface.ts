@@ -5,8 +5,8 @@ import {Type} from "../../type/Type";
  * @param interfaces List of interfaces this class is declared to implement.
  * @author Jānis Radiņš
  */
-export function MapInterface(... interfaces:Type<any>[]):Function {
-    return (target:Type<any>):Type<any> => {
+export function MapInterface(... interfaces:Type[]):Function {
+    return (target: Type): Type => {
         if (interfaces.length > 0) {
             metadataInternal.getTypeDescriptor(target).setMappedInterfaces(interfaces);
         }

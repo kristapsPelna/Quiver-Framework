@@ -7,8 +7,8 @@ import {Injector} from "../Injector";
  */
 export class ClassProvider implements InjectionValueProvider {
 
-    constructor(private injector:Injector,
-                public type:Type<any>) {
+    constructor(private injector: Injector,
+                public readonly type: Type) {
 
     }
 

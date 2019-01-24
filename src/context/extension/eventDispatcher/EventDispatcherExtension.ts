@@ -8,7 +8,7 @@ import {ContextLifecycleEvent} from "../../event/ContextLifecycleEvent";
  */
 export class EventDispatcherExtension implements ContextExtension {
 
-    private context:Context;
+    private context: Context;
 
     extend(context: Context): void {
         this.context = context;
@@ -27,14 +27,14 @@ export class EventDispatcherExtension implements ContextExtension {
     /**
      * Context is about to initialize - seal EventDispatcher so all parties of application receive same instance
      */
-    private sealEventDispatcher():void {
+    private sealEventDispatcher(): void {
         this.context.injector.getMapping(EventDispatcher).seal();
     }
 
     /**
      * Remove all listeners from EventDispatcher as Context is destroyed
      */
-    private clearEventDispatcher():void {
+    private clearEventDispatcher(): void {
         this.context.injector.get(EventDispatcher).removeAllEventListeners();
     }
 }
