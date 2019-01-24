@@ -10,14 +10,16 @@ import {InjectionMapping} from "../../src/injector/data/InjectionMapping";
 import {CustomModelWithPostConstruct} from "./data/CustomModelWithPostConstruct";
 import {AbstractClass} from "./data/AbstractClass";
 import {AbstractClassImpl} from "./data/AbstractClassImpl";
+import {FactoryMethod} from "../../src/injector/provider/FactoryProvider";
 
 /**
  * Injector test suite
  * @author Kristaps Peļņa
  */
-@suite export class InjectorTest {
+@suite
+export class InjectorTest {
 
-    private injector:Injector;
+    private injector: Injector;
 
     before() {
         this.injector = new Injector();
@@ -37,7 +39,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
         this.injector = null;
     }
 
-    @test("Get self")
+    /*@test("Get self")
     get() {
         expect(
             this.injector.get(Injector),
@@ -56,7 +58,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
     @test("Map")
     map() {
         this.injector.map(CustomModel);
-        let model:CustomModel = this.injector.get(CustomModel);
+        let model: CustomModel = this.injector.get(CustomModel);
 
         expect(
             model,
@@ -72,7 +74,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
     @test("Map as singleton")
     mapAsSingleton() {
         this.injector.map(CustomModel).asSingleton();
-        let model:CustomModel = this.injector.get(CustomModel);
+        let model: CustomModel = this.injector.get(CustomModel);
 
         expect(
             model,
@@ -107,7 +109,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Map to value")
     mapToValue() {
-        let model:CustomModel = new CustomModel();
+        let model: CustomModel = new CustomModel();
         model.value = 999;
 
         this.injector.map(CustomModel).toValue(model);
@@ -147,10 +149,47 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
             "Abstract class should be usable as mapping key"
         ).to.be.instanceof(AbstractClassImpl);
     }
+*/
+    @test("Map to factory method")
+    mapToFactory() {
+        const {injector} = this;
 
+        type A = {
+            (): CustomModel;
+        };
+
+        const aaa: A = () => new CustomModel();
+        const bbb = aaa()
+
+        const method: FactoryMethod<CustomModel> = () => new CustomModel();
+
+        injector.map(CustomModel).toFactory(method);
+        expect(
+            injector.get(CustomModel).value,
+            "Default factory must be invoked anew each time"
+        ).not.to.be.equal(
+            injector.get(CustomModel).value
+        );
+    }
+
+    /*@test("Map to single factory method")
+    mapToSingleFactory() {
+        const {injector} = this;
+
+        injector.map(CustomModel).toFactory(() => ({name: "a", value: Math.random()})).asSingleton();
+
+        expect(
+            injector.get(CustomModel).value,
+            "Singleton factory must return same value each time"
+        ).to.be.equal(
+            injector.get(CustomModel).value
+        );
+    }*/
+
+/*
     @test("Create subInjector")
     createSubInjector() {
-        let subInjector:Injector = this.injector.createSubInjector();
+        let subInjector: Injector = this.injector.createSubInjector();
         subInjector.map(CustomModel).asSingleton();
 
         expect(
@@ -181,7 +220,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Has direct mapping")
     hasDirectMapping() {
-        let subInjector:Injector = this.injector.createSubInjector();
+        let subInjector: Injector = this.injector.createSubInjector();
         this.injector.map(CustomModel).asSingleton();
 
         expect(
@@ -219,7 +258,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Seal")
     seal() {
-        const mapping:InjectionMapping = this.injector.map(CustomModel);
+        const mapping: InjectionMapping = this.injector.map(CustomModel);
         mapping.seal();
 
         expect(
@@ -230,7 +269,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Unseal")
     unseal() {
-        const mapping:InjectionMapping = this.injector.map(CustomModel);
+        const mapping: InjectionMapping = this.injector.map(CustomModel);
 
         expect(
             () => mapping.unseal(null),
@@ -247,7 +286,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Remapping")
     remapping() {
-        const mapping:InjectionMapping = this.injector.map(CustomModel2).asSingleton();
+        const mapping: InjectionMapping = this.injector.map(CustomModel2).asSingleton();
 
         expect(
             () => mapping.toValue(new CustomModel()),
@@ -257,7 +296,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Instantiate instance")
     instantiateInstance() {
-        let model:any = this.injector.instantiateInstance(CustomModel);
+        let model: any = this.injector.instantiateInstance(CustomModel);
 
         expect(
             model,
@@ -272,7 +311,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Inject Into")
     @timeout(500) //Limit waiting time in case the callback is not called
-    injectInto(done:() => void) {
+    injectInto(done: () => void) {
         expect(
             () => this.injector.injectInto(new ClassWithInjections()),
             "An error should be thrown because the injections can not be provided"
@@ -289,14 +328,14 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Property injections")
     propertyInjections() {
-        let model:CustomModelWithInject = this.injector.instantiateInstance(CustomModelWithInject);
+        let model: CustomModelWithInject = this.injector.instantiateInstance(CustomModelWithInject);
 
         expect(
             model.injector,
             "Instantiated instance should have their Inject() properties filled"
         ).to.not.be.undefined;
 
-        let extendedModel:CustomExtendedModel = this.injector.instantiateInstance(CustomExtendedModel);
+        let extendedModel: CustomExtendedModel = this.injector.instantiateInstance(CustomExtendedModel);
 
         expect(
             extendedModel.injector,
@@ -306,7 +345,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Destroy mapping")
     destroyMapping() {
-        const mapping:InjectionMapping = this.injector.map(CustomModel);
+        const mapping: InjectionMapping = this.injector.map(CustomModel);
 
         expect(
             () => mapping.destroy(),
@@ -331,8 +370,8 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Destroy instance")
     @timeout(500) //Limit waiting time in case the callback is not called
-    destroyInstance(done:() => void) {
-        let model:CustomModelWithInject = this.injector.instantiateInstance(CustomModelWithInject);
+    destroyInstance(done: () => void) {
+        let model: CustomModelWithInject = this.injector.instantiateInstance(CustomModelWithInject);
         CustomModelWithInject.onDestroy = done;
         this.injector.destroyInstance(model);
     }
@@ -343,7 +382,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
     }
 
     @test("Destroy injector")
-    destroyInjector(done:() => void) {
+    destroyInjector(done: () => void) {
         this.injector.map(CustomModelWithInject).asSingleton();
         this.injector.get(CustomModelWithInject);
 
@@ -351,7 +390,7 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
         this.injector.destroy();
 
-        const methods:Function[] = [
+        const methods: Function[] = [
             () => this.injector.createSubInjector(),
             () => this.injector.map(null),
             () => this.injector.unMap(null),
@@ -387,9 +426,9 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
     @test("Instance must be available in Injector before @PostConstruct is invoked")
     @timeout(10)
-    isInstanceInInjectorOnPostConstruct(done:() => void) {
+    isInstanceInInjectorOnPostConstruct(done: () => void) {
         this.injector.map(CustomModelWithPostConstruct).asSingleton();
-        let instance:CustomModelWithPostConstruct;
+        let instance: CustomModelWithPostConstruct;
         CustomModelWithPostConstruct.onPostConstruct = () => {
             expect(
                 this.injector.get(CustomModelWithPostConstruct),
@@ -401,5 +440,6 @@ import {AbstractClassImpl} from "./data/AbstractClassImpl";
 
         instance = this.injector.get(CustomModelWithPostConstruct);
     }
+*/
 
 }

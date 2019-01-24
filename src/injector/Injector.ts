@@ -6,6 +6,7 @@ import {metadata} from "../metadata/metadata";
 import {typeReferenceToString} from "../util/StringUtil";
 import {PropertyInjection} from "../metadata/data/PropertyInjection";
 import {ClassType} from "../type/ClassType";
+import {CustomModel} from "../../test/injector/data/CustomModel";
 
 /**
  * Dependencies provider implementation class
@@ -64,7 +65,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if method is invoked on destroyed instance
      * @throws Error in case if attempt to override sealed mapping is encountered
      */
-    map(type: ClassType): InjectionMapping {
+    map<T extends ClassType>(type: T): InjectionMapping<Exclude<T, "prototype">> {
         this.throwErrorIfDestroyed();
 
         if (this.hasDirectMapping(type)) {
@@ -80,7 +81,7 @@ export class Injector extends EventDispatcher {
             this.unMap(type);
         }
 
-        const mapping = new InjectionMapping(type, this, this.MASTER_SEAL_KEY);
+        const mapping = new InjectionMapping<Exclude<T, "prototype">>(type, this, this.MASTER_SEAL_KEY);
         this.mappings.set(type, mapping);
         this.dispatchEvent(new MappingEvent(MappingEvent.MAPPING_CREATED, type, mapping));
         return mapping;
@@ -159,7 +160,7 @@ export class Injector extends EventDispatcher {
      * @throws Error in case if method i invoked on destroyed instance
      * @throws Error when no mapping was found for the specified dependency
      */
-    getMapping(type: ClassType): InjectionMapping {
+    getMapping<T extends ClassType>(type: T): InjectionMapping<T> {
         this.throwErrorIfDestroyed();
 
         if (!this.hasDirectMapping(type)) {
