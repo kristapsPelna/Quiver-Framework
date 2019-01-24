@@ -149,7 +149,6 @@ export class MediatorMap {
 
             if (mappedInterfaces && mappedInterfaces.indexOf(mapping.type as Type) !== -1) {
                 mappings.push(mapping);
-                continue;
             }
 
             // TODO JR: This one is old-school and should be removed at some point as static isInstanceOf() is not encouraged

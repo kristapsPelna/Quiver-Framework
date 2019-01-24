@@ -9,15 +9,22 @@ import {Injector} from "../../src/injector/Injector";
 import {Event} from "../../src/eventDispatcher/event/Event";
 import {CommandMappingImpl} from "../../src/commandMap/data/impl/CommandMappingImpl";
 import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
+import {EventDispatcher} from "../../src/eventDispatcher/EventDispatcher";
+import {Context} from "../../src/context/Context";
+import {ModuleWithMetatag} from "./data/ModuleWithMetatag";
+import {CommandMapExtension} from "../../src/context/extension/commandMap/CommandMapExtension";
+import {EventDispatcherExtension} from "../../src/context/extension/eventDispatcher/EventDispatcherExtension";
+
 
 /**
  * CommandMap test suite
  * @author Kristaps Peļņa
  */
-@suite export class CommandMapTest {
+@suite
+export class CommandMapTest {
 
-    private injector:Injector = new Injector();
-    private commandMap:CommandMap;
+    private injector = new Injector();
+    private commandMap: CommandMap;
 
     before() {
         this.commandMap = this.injector.instantiateInstance(CommandMap);
@@ -27,7 +34,7 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
         this.commandMap.unMap();
         this.commandMap = null;
 
-        //Clear custom command static callbacks
+        // Clear custom command static callbacks
         CustomCommand.done = null;
         CustomCommand2.done = null;
         CustomMacroCommand.done = null;
@@ -48,7 +55,7 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Trigger event with eventName")
     triggerEventWithEventName() {
-        const eventName:string = "test";
+        const eventName = "test";
         expect(
             this.commandMap.trigger(eventName),
             "Command trigger with eventName should not throw an error"
@@ -57,8 +64,7 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Trigger event with event instance")
     triggerEventWithEventInstance() {
-        const event:Event = new Event("test");
-
+        const event = new Event("test");
         expect(
             this.commandMap.trigger(event),
             "Command trigger with event instance should not throw an error"
@@ -67,11 +73,11 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Map command")
     @timeout(500) //Limit waiting time in case the callback is not called
-    mapCommand(done:() => void) {
-        const eventName:string = "test";
+    mapCommand(done: () => void) {
+        const eventName = "test";
         CustomCommand.done = done;
 
-        const mapping:CommandMappingImpl = this.commandMap.map(eventName, CustomCommand) as CommandMappingImpl;
+        const mapping = this.commandMap.map(eventName, CustomCommand) as CommandMappingImpl;
 
         expect(
             mapping.eventClass,
@@ -88,8 +94,8 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Map command once")
     mapCommandOnce() {
-        const eventName:string = "test";
-        let executeCount:number = 0;
+        const eventName = "test";
+        let executeCount = 0;
 
         CustomCommand.done = () => {
             executeCount++;
@@ -100,7 +106,6 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
         };
 
         this.commandMap.map(eventName, CustomCommand).once();
-
         this.commandMap.trigger(eventName);
 
         expect(
@@ -113,7 +118,7 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Map command twice")
     mapCommandTwice() {
-        const eventName:string = "test";
+        const eventName = "test";
 
         expect(
             this.commandMap.map(eventName, CustomCommand),
@@ -128,10 +133,10 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Map command to two events")
     mapCommandToTwoEvents() {
-        const eventName:string = "test";
-        const eventName2:string = "test2";
+        const eventName = "test";
+        const eventName2 = "test2";
 
-        let executeCount:number = 0;
+        let executeCount = 0;
 
         CustomCommand.done = () => executeCount++;
 
@@ -149,11 +154,9 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Map command with successful guard")
     @timeout(500) //Limit waiting time in case the callback is not called
-    mapCommandWithSuccessfulGuard(done:() => void) {
-        const eventName:string = "test";
-        const guard:EventGuard = () => {
-            return true;
-        };
+    mapCommandWithSuccessfulGuard(done: () => void) {
+        const eventName = "test";
+        const guard: EventGuard = () => true;
         CustomCommand.done = done;
 
         this.commandMap.map(eventName, CustomCommand).withGuards(guard);
@@ -162,10 +165,9 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Map command with unsuccessful guard")
     mapCommandWithUnsuccessfulGuard() {
-        const eventName:string = "test";
-        const guard:EventGuard = () => {
-            return false;
-        };
+        const eventName = "test";
+        const guard: EventGuard = () =>  false;
+
         CustomCommand.done = () => {
             throw new Error("Command should not be executed because the guard should block it");
         };
@@ -176,7 +178,7 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("unMap command")
     unMapCommand() {
-        const eventName:string = "test";
+        const eventName = "test";
         CustomCommand.done = () => {
             throw new Error("Command should not be executed because it has been unMapped");
         };
@@ -194,8 +196,8 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("unMap command twice")
     unMapCommandTwice() {
-        const eventName:string = "test";
-        const eventName2:string = "test2";
+        const eventName = "test";
+        const eventName2 = "test2";
 
         this.commandMap.map(eventName, CustomCommand);
         this.commandMap.map(eventName2, CustomCommand);
@@ -213,8 +215,8 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("unMap command from two different events")
     unMapCommandFromTwoEvents() {
-        const eventName:string = "test";
-        const eventName2:string = "test2";
+        const eventName = "test";
+        const eventName2 = "test2";
 
         this.commandMap.map(eventName, CustomCommand);
         this.commandMap.map(eventName2, CustomCommand);
@@ -232,8 +234,8 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("unMap command from wrong event")
     unMapCommandFromWrongEvent() {
-        const eventName:string = "test";
-        const eventName2:string = "test2";
+        const eventName = "test";
+        const eventName2 = "test2";
 
         this.commandMap.map(eventName2, CustomCommand2);
         this.commandMap.map(eventName, CustomCommand);
@@ -246,7 +248,7 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("unMap all commands from event")
     unMapAllCommandsFromEvent() {
-        const eventName:string = "test";
+        const eventName = "test";
         CustomCommand.done = CustomCommand2.done = () => {
             throw new Error("Command should not be executed because it should be unMapped");
         };
@@ -266,8 +268,8 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("unMap everything")
     unMapEverything() {
-        const eventName:string = "firstEvent";
-        const eventName2:string = "secondEvent";
+        const eventName = "firstEvent";
+        const eventName2 = "secondEvent";
         CustomCommand.done = CustomCommand2.done = () => {
             throw new Error("Command should not be executed because it should be unMapped");
         };
@@ -289,8 +291,8 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Check invalid value mapping")
     checkInvalidValueMapping() {
-        const eventName:string = "test";
-        const invalidValues:any[] = [undefined, null, ""];
+        const eventName = "test";
+        const invalidValues: any[] = [undefined, null, ""];
 
         for (let value of invalidValues) {
             expect(
@@ -307,9 +309,9 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Check invalid trigger")
     checkInvalidTrigger() {
-        const invalidValues:any[] = [undefined, null, ""];
+        const invalidValues = [undefined, null, ""];
 
-        for (let value of invalidValues) {
+        for (const value of invalidValues) {
             expect(
                 () => this.commandMap.trigger(value),
                 "Triggering CommandMap with an invalid value should throw an error. value: " + value
@@ -319,28 +321,17 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Macro command add")
     macroCommandAdd() {
-        const macroCommand:MacroCommand = new MacroCommand();
+        const macroCommand = new MacroCommand();
         macroCommand.add(CustomCommand);
 
-        expect(
-            macroCommand.has(CustomCommand),
-            "Macro command should have CustomCommand"
-        ).to.be.true;
-
-        expect(
-            macroCommand.has(CustomCommand2),
-            "Macro command should not have CustomCommand2"
-        ).to.be.false;
-
-        expect(
-            () => macroCommand.add(null),
-            "Trying to add a null command should throw an error"
-        ).to.throw(Error);
+        expect(macroCommand.has(CustomCommand), "Macro command should have CustomCommand").to.be.true;
+        expect(macroCommand.has(CustomCommand2), "Macro command should not have CustomCommand2").to.be.false;
+        expect(() => macroCommand.add(null), "Trying to add a null command should throw an error").to.throw(Error);
     }
 
     @test("Macro command remove")
     macroCommandRemove() {
-        const macroCommand:MacroCommand = new MacroCommand();
+        const macroCommand = new MacroCommand();
         macroCommand.add(CustomCommand);
 
         expect(
@@ -366,12 +357,33 @@ import {MacroCommand} from "../../src/commandMap/command/MacroCommand";
 
     @test("Macro command execute")
     @timeout(500) //Limit waiting time in case the callback is not called
-    macroCommandExecute(done:() => void) {
-        const eventName:string = "test";
+    macroCommandExecute(done: () => void) {
+        const eventName = "test";
         CustomMacroCommand.done = done;
 
         this.commandMap.map(eventName, CustomMacroCommand);
         this.commandMap.trigger(eventName);
+    }
+
+    @test("Can map multiple event in module decorator")
+    multipleCommandsCanBeMappedInModuleDecorator() {
+
+        let executeCount = 0;
+
+        CustomCommand.done = () => executeCount++;
+        CustomCommand2.done = () => executeCount++;
+
+        const context = new Context().install(CommandMapExtension, EventDispatcherExtension).configure(ModuleWithMetatag);
+        context.initialize();
+
+        const dispatcher = context.injector.get(EventDispatcher);
+        dispatcher.dispatchEvent("multiCommandEvent");
+
+        expect(
+            executeCount,
+            "Both commands must be executed"
+        ).to.be.eq(2);
+
     }
 
 }

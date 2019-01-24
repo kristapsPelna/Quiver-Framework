@@ -6,7 +6,6 @@ import {CommandMap} from "../../../commandMap/CommandMap";
 import {EventDispatcherForCommandMap} from "./impl/EventDispatcherForCommandMap";
 import {InjectionMapping} from "../../../injector/data/InjectionMapping";
 import {ContextModuleEvent} from "../../event/ContextModuleEvent";
-import {CommandMapping} from "../../../commandMap/data/CommandMapping";
 
 /**
  * Add this extension in order to add support for CommandMap which is receiving its trigger calls from EventDispatcher.
@@ -22,7 +21,7 @@ export class CommandMapExtension implements ContextExtension {
     extend(context: Context): void {
         this.context = context;
 
-        //Map default CommandMap implementation to injector but don't seal it yet before Context is not initialized
+        // Map default CommandMap implementation to injector but don't seal it yet before Context is not initialized
         this.commandMapMapping = context.injector.map(CommandMap).asSingleton();
 
         context.listenOnce(ContextLifecycleEvent.PRE_INITIALIZE, this.mapCustomEventDispatcher, this);
@@ -31,17 +30,15 @@ export class CommandMapExtension implements ContextExtension {
         context.listenOnce(ContextLifecycleEvent.DESTROY, this.clearCommandMap, this);
 
         context.addEventListener(ContextModuleEvent.REGISTER_MODULE, this.createModuleMappings, this)
-            .withGuards((event: ContextModuleEvent): boolean => {
-                return !!(event.moduleDescriptor && event.moduleDescriptor.commandMap);
-            });
+            .withGuards(({moduleDescriptor}: ContextModuleEvent) => !!(moduleDescriptor && moduleDescriptor.commandMap));
     }
 
     private mapCustomEventDispatcher(): void {
-        //If default event dispatcher is already mapped - remove it
+        // If default event dispatcher is already mapped - remove it
         if (this.context.injector.hasDirectMapping(EventDispatcher)) {
             this.context.injector.unMap(EventDispatcher);
         }
-        //And replace it with custom implementation that will forward event dispatches to CommandMap
+        // And replace it with custom implementation that will forward event dispatches to CommandMap
         this.context.injector.map(EventDispatcher).toSingleton(EventDispatcherForCommandMap);
     }
 
@@ -51,7 +48,7 @@ export class CommandMapExtension implements ContextExtension {
     }
 
     private clearCommandMap(): void {
-        //Clear all command mappings as context is destroyed
+        // Clear all command mappings as context is destroyed
         this.commandMap.unMap();
     }
 
@@ -59,12 +56,14 @@ export class CommandMapExtension implements ContextExtension {
         this.context.removeAllEventListeners(this);
     }
 
-    private createModuleMappings(event: ContextModuleEvent): void {
-        for (let mapping of event.moduleDescriptor.commandMap) {
-            let commandMapping: CommandMapping = this.commandMap.map(mapping.event, mapping.command);
-            if ("once" in mapping && mapping.once === true) {
-                commandMapping.once();
-            }
+    private createModuleMappings({moduleDescriptor: {commandMap}}: ContextModuleEvent): void {
+        for (const {event, command, once} of commandMap) {
+            (Array.isArray(command) ? command : [command]).forEach(command => {
+                const mapping = this.commandMap.map(event, command);
+                if (once === true) {
+                    mapping.once();
+                }
+            });
         }
     }
 
