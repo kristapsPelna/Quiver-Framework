@@ -1,4 +1,5 @@
 import {Type} from "../../type/Type";
+
 /**
  * Command mapping descriptor to be used within system module meta data.
  * @author Jānis Radiņš
@@ -11,9 +12,9 @@ export interface CommandMappingDescriptor {
     readonly event: string,
 
     /**
-     * Command type that should be invoked as event name listed in event property is fired in system context.
+     * Command type or list of commands that should be invoked as event name listed in event property is fired in system context.
      */
-    readonly command: Type;
+    readonly command: Type | Type[];
 
     /**
      * Describes if command should be executed only once.

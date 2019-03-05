@@ -5,6 +5,7 @@ import {metadata} from "../metadata/metadata";
 import {typeReferenceToString} from "../util/StringUtil";
 import {Mediator} from "./Mediator";
 import {ClassType} from "../type/ClassType";
+
 /**
  * Mediator map utility represents a list of view component/interface mappings to their Mediator classes.
  * @author Jānis Radiņš / Kristaps Peļņa
@@ -148,7 +149,6 @@ export class MediatorMap {
 
             if (mappedInterfaces && mappedInterfaces.indexOf(mapping.type as Type) !== -1) {
                 mappings.push(mapping);
-                continue;
             }
 
             // TODO JR: This one is old-school and should be removed at some point as static isInstanceOf() is not encouraged

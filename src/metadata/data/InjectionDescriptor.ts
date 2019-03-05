@@ -1,13 +1,12 @@
 import {Type} from "../../type/Type";
 /**
- * Injection descriprot object shape.
+ * Injection descriptor object shape.
  * @author Jānis Radiņš
  */
 export interface InjectionDescriptor {
 
     /**
      * Injection mapping key which will be used to extract mapping.
-     * (any is added due to the fact that abstract classes do not resolve as Type)
      */
     readonly map: Type | any;
 
@@ -38,7 +37,7 @@ export interface InjectionDescriptor {
     readonly asSingleton?: boolean;
 
     /**
-     * Auto instantiate mapping as application context is created, if this property is set to true.
+     * Auto instantiate mapping as context is created, if this property is set to true.
      * @default false
      */
     readonly instantiate?: boolean;

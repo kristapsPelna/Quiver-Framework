@@ -7,9 +7,8 @@ import {ModuleDescriptor} from "../metadata/data/ModuleDescriptor";
 import {metadata} from "../metadata/metadata";
 import {TypeMetadata} from "../metadata/data/TypeMetadata";
 import {ContextModuleEvent} from "./event/ContextModuleEvent";
-import {InjectionMapping} from "../injector/data/InjectionMapping";
 import {typeReferenceToString} from "../util/StringUtil";
-import {InjectionDescriptor} from "../metadata/data/InjectionDescriptor";
+import {applyInjectorMapping} from "../util/injector-util";
 
 /**
  * Application context representation class - a hosting environment for application or its sub context
@@ -257,61 +256,16 @@ export class Context extends EventDispatcher {
     }
 
     private prepareInjector(): void {
-        let injectionsToInstantiate: Type[] = [];
-        this.moduleMetadata.forEach((moduleDescriptor: ModuleDescriptor) => {
-            if (!moduleDescriptor.mappings) {
-                return;
-            }
-
-            for (let mapping of moduleDescriptor.mappings) {
-                injectionsToInstantiate.push(...this.prepareMapping(mapping));
+        const toInstantiate: Type[] = [];
+        this.moduleMetadata.forEach(({mappings}) => {
+            if (mappings) {
+                mappings.forEach(
+                    mapping => toInstantiate.push(... applyInjectorMapping(mapping, this.injector))
+                );
             }
         });
-        //Instantiate mappings that have been marked so
-        for (let instanceToInstantiate of injectionsToInstantiate) {
-            this.injector.get(instanceToInstantiate);
-        }
-    }
-
-    private prepareMapping(mapping: Type | InjectionDescriptor): Type[] {
-        const injectionsToInstantiate: Type[] = [];
-
-        //We have got a singular entry and such are to be mapped as singletons
-        if ("map" in mapping === false) {
-            const mappedType = mapping as Type;
-            if (this.injector.hasDirectMapping(mappedType)) {
-                this.injector.unMap(mappedType);
-            }
-            this.injector.map(<Type> mapping).asSingleton();
-        } else {
-            const injection = mapping as InjectionDescriptor;
-            if (typeof injection.map !== "function") {
-                throw new Error("Injection mapping doesn't seem to be a valid object type");
-            }
-
-            const injectionMapping = this.injector.map(injection.map);
-            if (injection.useExisting) {
-                //if use existing is set create forward reference and ignore the rest
-                injectionMapping.toExisting(injection.useExisting);
-            } else if (injection.useValue) {
-                //Look for use value as next one
-                injectionMapping.toValue(injection.useValue);
-            } else if (injection.useType) {
-                //If use type is set map injection to type or to singleton in case if asSingleton is present
-                if ('asSingleton' in injection && !injection.asSingleton) {
-                    injectionMapping.toType(injection.useType);
-                } else {
-                    injectionMapping.toSingleton(injection.useType);
-                }
-            } else if (injectionMapping.asSingleton) {
-                //If everything else fails make mapping as singleton
-                injectionMapping.asSingleton();
-            }
-            if (injection.instantiate && injectionsToInstantiate.indexOf(injection.map) === -1) {
-                injectionsToInstantiate.push(injection.map);
-            }
-        }
-        return injectionsToInstantiate;
+        // Instantiate mappings that have been marked so
+        toInstantiate.forEach(type => this.injector.get(type));
     }
 
     private initializeModules(): void {
